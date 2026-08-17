@@ -1,0 +1,230 @@
+[
+    {
+        "trial": 1,
+        "red_name": "Noah",
+        "blue_name": "Alex",
+        "red_color": "Color.AQUA",
+        "blue_color": "Color.SALMON",
+        "red_start": [0,0],
+        "blue_start": [0,3],
+        "t1": {
+            "red_level": 0,
+            "blue_level": 1,
+            "blue_intention": "hinder",
+            "seed": 65
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 65
+        }
+    },
+    {
+        "trial": 2,
+        "red_name": "Ari",
+        "blue_name": "Cameron",
+        "red_color": "Color.GREEN",
+        "blue_color": "Color.BROWN",
+        "red_start": [0,0],
+        "blue_start": [0,3],
+        "t1": {
+            "red_level": 0,
+            "blue_level": 1,
+            "blue_intention": "hinder",
+            "seed": 135
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 135
+        }
+    },
+    {
+        "trial": 3,
+        "red_name": "Harper",
+        "blue_name": "Whitney",
+        "red_color": "Color.DARK_PINK",
+        "blue_color": "Color.LIME",
+        "red_start": [0,0],
+        "blue_start": [3,2],
+        "t1": {
+            "red_level": 0,
+            "blue_level": 1,
+            "blue_intention": "hinder",
+            "seed": 16
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 16
+        }
+    },
+    {
+        "trial": 4,
+        "red_name": "Logan",
+        "blue_name": "Hunter",
+        "red_color": "Color.MEDIUM_PURPLE",
+        "blue_color": "Color.ORANGE",
+        "red_start": [0,0],
+        "blue_start": [2,4],
+        "t1": {
+            "red_level": 0,
+            "blue_level": 1,
+            "blue_intention": "hinder",
+            "seed": 217
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 217
+        }
+    },
+    {
+        "trial": 5,
+        "red_name": "Avery",
+        "blue_name": "Jordan",
+        "red_color": "Color.PINK",
+        "blue_color": "Color.NAVY",
+        "red_start": [0,0],
+        "blue_start": [2,1],
+        "t1": {
+            "red_level": 0,
+            "blue_level": 1,
+            "blue_intention": "hinder",
+            "seed": 123
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 123
+        }
+    },
+    {
+        "trial": 6,
+        "red_name": "Madison",
+        "blue_name": "Darcy",
+        "red_color": "Color.TEAL",
+        "blue_color": "Color.MAROON",
+        "red_start": [0,0],
+        "blue_start": [3,2],
+        "t1": {
+            "red_level": 0,
+            "blue_level": 1,
+            "blue_intention": "hinder",
+            "seed": 2
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 2
+        }
+    },
+    {
+        "trial": 7,
+        "red_name": "Riley",
+        "blue_name": "Brook",
+        "red_color": "Color.DARK_GREEN",
+        "blue_color": "Color.LIGHT_RED",
+        "red_start": [0,0],
+        "blue_start": [3,1],
+        "t1": {
+            "red_level": 0,
+            "blue_level": 1,
+            "blue_intention": "help",
+            "seed": 339
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 296
+        }
+    },
+    {
+        "trial": 8,
+        "red_name": "Hayden",
+        "blue_name": "Cedar",
+        "red_color": "Color.CRIMSON",
+        "blue_color": "Color.GOLD",
+        "red_start": [0,0],
+        "blue_start": [5,4],
+        "t1": {
+            "red_level": 0,
+            "blue_level": 1,
+            "blue_intention": "help",
+            "seed": 496
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 539
+        }
+    },
+    {
+        "trial": 9,
+        "red_name": "Robin",
+        "blue_name": "Blake",
+        "red_color": "Color.CORAL",
+        "blue_color": "Color.PURPLE",
+        "red_start": [0,0],
+        "blue_start": [0,1],
+        "t1": {
+            "red_level": 2,
+            "blue_level": 1,
+            "blue_intention": "help",
+            "seed": 548
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 9
+        }
+    },
+    {
+        "trial": 10,
+        "red_name": "Sloan",
+        "blue_name": "Bryce",
+        "red_color": "Color.LIGHT_BLUE",
+        "blue_color": "Color.LIGHT_ORANGE",
+        "red_start": [0,0],
+        "blue_start": [3,4],
+        "t1": {
+            "red_level": 2,
+            "blue_level": 1,
+            "blue_intention": "help",
+            "seed": 8
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 4
+        }
+    },
+    {
+        "trial": 11,
+        "red_name": "Max",
+        "blue_name": "London",
+        "red_color": "Color.YELLOW",
+        "blue_color": "Color.MEDIUM_PINK",
+        "red_start": [0,0],
+        "blue_start": [5,0],
+        "t1": {
+            "red_level": 0,
+            "blue_level": 1,
+            "blue_intention": "help",
+            "seed": 5
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 1826
+        }
+    },
+    {
+        "trial": 12,
+        "red_name": "Brooklyn",
+        "blue_name": "Grey",
+        "red_color": "Color.DULL_PURPLE",
+        "blue_color": "Color.ALIEN_GREEN",
+        "red_start": [0,0],
+        "blue_start": [2,2],
+        "t1": {
+            "red_level": 2,
+            "blue_level": 1,
+            "blue_intention": "help",
+            "seed": 16
+        },
+        "t2": {
+            "red_level": 0,
+            "seed": 1
+        }
+    }
+]

@@ -1,0 +1,51 @@
+id,age,gender,race,ethnicity,time,feedback
+1,35,Male,White,Non-Hispanic,1021.483,"If the starting state of the board had a block that prevented the red dot from reaching the goal at all, or the red player did not have enough time to reach the goal regardless of the blue dot's presence or absence, it would have failed without the blue dot. Otherwise, the red dot would have succeeded without the blue dot."
+2,28,Male,Asian,Non-Hispanic,561.369,Whether or not the box was already blocking the path of the read circle. Whether or not the red circle was 10 moves away from the start without moving any of the boxes around.
+3,49,Male,Black/African American,Non-Hispanic,1529.398,"I considered the distance between the red and the star, the role of the blue in each scenario, and the blockage- how it could affect the red to reach the star."
+4,36,Male,American Indian/Alaska Native,Non-Hispanic,562.548,I just counted the squares to see if they could've moved in 10 turns or checked to see if the way was obstructed totally/only able to be opened by a blue player.
+5,44,Female,White,Non-Hispanic,817.368,I looked at if there was a block in the way or if the star was more than 10 steps away
+6,39,Male,White,Non-Hispanic,652.858,"Nope, thank you."
+7,28,Female,White,Non-Hispanic,519.264,"If there was a clear path, then I thought the red person would've made it without the blue person being there."
+8,22,Male,Asian,Non-Hispanic,810.113,The number of steps allocated for each player
+9,23,Female,White,Non-Hispanic,837.354,
+10,31,Male,White,Non-Hispanic,571.058,counting the squares for additional possible moves
+11,24,Female,White,Non-Hispanic,727.851,Counted the spaces and considered what they would have done without the blue player.
+12,37,Male,Black/African American,Non-Hispanic,606.689,"I always counted out how many steps the red circle would've been able to take without the blue one being around, and there were certain scenarios where it wouldn't have made it regardless of what blue did."
+13,32,Male,Asian,Non-Hispanic,727.549,number of spaces and paths available 
+14,50,Male,White,Non-Hispanic,1004.049,how the map was
+15,55,Female,White,Non-Hispanic,1901.708,The amount of time that would have been left if the blue player didn't block the red factored into whether or not the red player would have succeeded without the blue player involvement.
+16,29,Male,White,Non-Hispanic,594.189,Nope
+17,30,Female,White,Non-Hispanic,1574.999,I calculated the number of moves to see if it would be possible for the red player to succeed with or without the blue player
+18,40,Female,Black/African American,Non-Hispanic,1102.845,"being able to count the moves to the state, seeing if it was already blocked before the moves"
+19,44,Male,White,Non-Hispanic,908.933,"Firstly, whether enough turns were available to reach the star regardless, then, it depended upon the actions of blue to help/hinder, and whether those made a difference in the pathway, or if alternative pathways were available, all within the turn limit."
+20,50,Male,White,Non-Hispanic,1110.166,seeing if there was a potential path around the obstacles along with the time remaining
+21,31,Male,White,Non-Hispanic,557.974,The amount of turns/ steps it would take the red player to get to the star if there was an open path to it
+22,33,Male,White,Non-Hispanic,1109.504,How many available to reach the star
+23,33,Female,Black/African American,Non-Hispanic,784.257,
+24,48,Female,White,Non-Hispanic,1037.645,I just observed if the blue hindered or helped and whether their help was necessary
+25,33,Female,White,Non-Hispanic,755.195,If the blue player blocked the red player then I knew there was no way they would succeed. If there was still an opening then I counted the squares and determined if there were enough spaces.
+26,26,Female,White,Non-Hispanic,945.885,
+27,29,Non-binary,White,Non-Hispanic,773.719,number of total allowed moves.
+28,30,Female,White,Hispanic,530.973,no
+29,25,Female,White,Non-Hispanic,594.663,Counting the distance of the shortest path possible without moving the black box.
+30,37,Male,White,Non-Hispanic,1551.472,I counted the time steps it would have taken as well as obstructions and whether the blue player made a significant difference.
+31,55,Female,White,Non-Hispanic,1141.724,"I made an assumption that red would always win, if possible."
+32,22,Male,White,Non-Hispanic,484.888,"If the star was impossible to reach without the blue player's help, I knew it was not possible at without them. If there were more than 10 tiles to the star without the blue player's help, I also knew it was not possible."
+33,21,Non-binary,White,Hispanic,400.91,none
+34,55,Female,Black/African American,Non-Hispanic,1677.951,I watched the move timer and counted the squares along with the moves.
+35,28,Male,White,Hispanic,842.91,The amount of turns needed to get to the goal and if it was possible to get to the goal without needing to have a block moved.
+36,33,Male,Asian,Non-Hispanic,504.01,
+37,36,Male,White,Non-Hispanic,603.418,
+38,26,Female,White,Non-Hispanic,823.349,How many spaces the red one had to travel... if the blue player moving the box had any effect on the red's path
+39,40,Female,American Indian/Alaska Native,Non-Hispanic,765.76,if the red player could make it to the star if the blue player wasn't there at all was what influenced my decisions
+40,22,Female,White,,1227.517,"Counting each space correctly, and only occasionally forgetting to consider how red is actually moving, not how he COULD move hypothetically. Also remembering that red can pass through blue, but not phase through walls or blocks. For example, if reds path is already closed off, and fails, the result would be the same without blue. Only a scenario in which there is an open path with enough spaces to move in can be altered by blues actions positively. Although some spaces would take too many steps, and so blues box moving would be futile in this example. I did want to say, I used a mobile phone for this experiment, but had absolutely zero issues regarding imagery or watching the replays etc. It went as smoothly as it could, and I was actually too invested to backtrack when I realized the intention to use desktop. I hope my input can be accepted regardless, as I really did try very hard to provide valuable data instead of quickly rushing through it all. "
+41,18,Male,White,Non-Hispanic,613.529,
+42,52,Male,Black/African American,Non-Hispanic,1229.069,
+43,25,Female,White,Non-Hispanic,683.734,"Counting the steps in the beginning, if not blocked, to see if the red circle could get there in time. "
+44,50,Female,White,Hispanic,1056.649,I considered the possible movement options
+45,25,Female,White,Non-Hispanic,1065.223,no
+46,37,Male,White,Non-Hispanic,510.809,The moves and the outcomes of them nothing outside of that.  no questions
+47,62,Male,White,Non-Hispanic,1735.986,"I considered whether the red player could make enough steps to reach the star if the blue player were not there to move it. Sometimes, even without the blue player there to move the block, the red player didn't have enough time to make the necessary steps to reach the star."
+48,41,Male,White,Non-Hispanic,816.02,Just based on the moves.
+49,50,Female,White,Non-Hispanic,1349.283,"If the block was in the way to the star at the start, could red move around and still have enough moves to the star? Was there more than one path to the star?"
+50,43,Male,White,Non-Hispanic,874.771,Just counted the steps to see if Red could do it alone. 

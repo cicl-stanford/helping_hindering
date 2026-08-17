@@ -1,0 +1,174 @@
+
+
+Red is at (0, 0), blue is at (0, 2) holding no box
+
+-----TIMESTEP 1-----
+Red's turn
+Red's belief about Blue: 0.5 help
+Q: {(0, 1): -0.648, (1, 0): -1.029, (0, 0): -1.060}
+Selecting random action
+Took action: (1, 0)
+Time: 20.6924 seconds
+
+Red is at (1, 0), blue is at (0, 2) holding no box
+
+Blue's turn
+Q: {(0, 1): 35.621, (1, 0): 57.682, (0, 0): 48.961}
+Selecting random action
+Took action: (0, 0)
+Time: 23.3963 seconds
+
+Red is at (1, 0), blue is at (0, 2) holding no box
+
+-----TIMESTEP 2-----
+Red's turn
+Red's belief about Blue: 0.4975447108466016 help
+Q: {(-1, 0): -1.851, (0, 1): -0.660, (1, 0): -0.571, (0, 0): -1.009}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0002 seconds
+
+Red is at (2, 0), blue is at (0, 2) holding no box
+
+Blue's turn
+Q: {(0, 1): 39.490, (1, 0): 52.661, (0, 0): 39.819}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0001 seconds
+
+Red is at (2, 0), blue is at (1, 2) holding no box
+
+-----TIMESTEP 3-----
+Red's turn
+Red's belief about Blue: 0.49759802247838925 help
+Q: {(-1, 0): -1.192, (0, 1): 0.105, (1, 0): 0.272, (0, 0): -0.303}
+Selecting random action
+Took action: (1, 0)
+Time: 0.0001 seconds
+
+Red is at (3, 0), blue is at (1, 2) holding no box
+
+Blue's turn
+Q: {(-1, 0): 43.379, (0, 1): 43.384, (1, 0): 55.583, (0, 0): 43.574}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0001 seconds
+
+Red is at (3, 0), blue is at (2, 2) holding no box
+
+-----TIMESTEP 4-----
+Red's turn
+Red's belief about Blue: 0.4976662537115019 help
+Q: {(-1, 0): -0.361, (0, 1): 1.153, (1, 0): 1.255, (0, 0): 0.641}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0001 seconds
+
+Red is at (4, 0), blue is at (2, 2) holding no box
+
+Blue's turn
+Q: {(-1, 0): 46.569, (0, 1): 46.571, (1, 0): 56.231, (0, 0): 46.667}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0001 seconds
+
+Red is at (4, 0), blue is at (3, 2) holding no box
+
+-----TIMESTEP 5-----
+Red's turn
+Red's belief about Blue: 0.4977476277781369 help
+Q: {(-1, 0): 0.736, (0, 1): 2.414, (1, 0): 2.365, (0, 0): 1.687}
+Selecting optimal action from [(0, 1)]
+Took action: (0, 1)
+Time: 0.0001 seconds
+
+Red is at (4, 1), blue is at (3, 2) holding no box
+
+Blue's turn
+Q: {(-1, 0): 35.925, (0, 1): 36.188, (2, 0): 69.379, (0, 0): 44.581}
+Selecting optimal action from [(2, 0)]
+Took action: (2, 0)
+Time: 0.0001 seconds
+
+Red is at (4, 1), blue is at (3, 2) holding box at (4, 2)
+
+-----TIMESTEP 6-----
+Red's turn
+Red's belief about Blue: 0.5760188065486717 help
+Q: {(-1, 0): 2.176, (0, -1): 2.462, (0, 0): 4.741}
+Selecting optimal action from [(0, 0)]
+Took action: (0, 0)
+Time: 0.0010 seconds
+
+Red is at (4, 1), blue is at (3, 2) holding box at (4, 2)
+
+Blue's turn
+Q: {(-1, 0): 73.593, (3, 0): 25.257, (0, 0): 41.289}
+Selecting optimal action from [(-1, 0)]
+Took action: (-1, 0)
+Time: 0.0002 seconds
+
+Red is at (4, 1), blue is at (2, 2) holding box at (3, 2)
+
+-----TIMESTEP 7-----
+Red's turn
+Red's belief about Blue: 0.9976851315519872 help
+Q: {(-1, 0): 3.848, (0, 1): 9.718, (0, -1): 3.848, (0, 0): 5.559}
+Selecting optimal action from [(0, 1)]
+Took action: (0, 1)
+Time: 0.0001 seconds
+
+Red is at (4, 2), blue is at (2, 2) holding box at (3, 2)
+
+Blue's turn
+Q: {(3, 0): 64.586, (0, 0): 64.396}
+Selecting random action
+Took action: (3, 0)
+Time: 0.0001 seconds
+
+Red is at (4, 2), blue is at (2, 2) holding no box
+
+-----TIMESTEP 8-----
+Red's turn
+Red's belief about Blue: 0.9975856144291014 help
+Q: {(0, 1): 12.600, (0, -1): 5.581, (0, 0): 7.592}
+Selecting optimal action from [(0, 1)]
+Took action: (0, 1)
+Time: 0.0003 seconds
+
+Red is at (4, 3), blue is at (2, 2) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0001 seconds
+
+Red is at (4, 3), blue is at (2, 2) holding no box
+
+-----TIMESTEP 9-----
+Red's turn
+Red's belief about Blue: 0.9974861172056603 help
+Q: {(-1, 0): 16.000, (0, 1): 16.000, (0, -1): 7.618, (0, 0): 9.976}
+Selecting optimal action from [(-1, 0), (0, 1)]
+Took action: (0, 1)
+Time: 0.0001 seconds
+
+Red is at (4, 4), blue is at (2, 2) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0001 seconds
+
+Red is at (4, 4), blue is at (2, 2) holding no box
+
+-----TIMESTEP 10-----
+Red's turn
+Red's belief about Blue: 0.9973866398776848 help
+Q: {(-1, 0): 20.000, (1, 0): 10.008, (0, -1): 10.008, (0, 0): 12.760}
+Selecting optimal action from [(-1, 0)]
+Took action: (-1, 0)
+
+Red reached goal!
+
+---------------------
+[(1, 0), (1, 0), (1, 0), (1, 0), (0, 1), (0, 0), (0, 1), (0, 1), (0, 1), (-1, 0)]
+[(0, 0), (1, 0), (1, 0), (1, 0), (2, 0), (-1, 0), (3, 0), (0, 0), (0, 0)]

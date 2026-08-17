@@ -1,0 +1,218 @@
+[
+    {
+        "trial": 1,
+        "red_start": [0, 0],
+        "blue_start": [4, 2],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "help",
+        "seed": 810
+    },
+    {
+        "trial": 2,
+        "red_start": [0, 0],
+        "blue_start": [1, 3],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "help",
+        "seed": 174
+    },
+    {
+        "trial": 3,
+        "red_start": [0, 0],
+        "blue_start": [2, 4],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "help",
+        "seed": 6357
+    },
+    {
+        "trial": 4,
+        "red_start": [0, 0],
+        "blue_start": [0, 2],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "help",
+        "seed": 3225
+    },
+    {
+        "trial": 5,
+        "red_start": [0, 0],
+        "blue_start": [1, 1],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "help",
+        "seed": 31
+    },
+    {
+        "trial": 6,
+        "red_start": [0, 0],
+        "blue_start": [0, 2],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "help",
+        "seed": 3707
+    },
+    {
+        "trial": 7,
+        "red_start": [0, 0],
+        "blue_start": [0, 4],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "help",
+        "seed": 4290
+    },
+    {
+        "trial": 8,
+        "red_start": [0, 0],
+        "blue_start": [1, 3],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "help",
+        "seed": 4577
+    },
+    {
+        "trial": 9,
+        "red_start": [0, 0],
+        "blue_start": [0, 3],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "hinder",
+        "seed": 131
+    },
+    {
+        "trial": 10,
+        "red_start": [0, 0],
+        "blue_start": [5, 2],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "hinder",
+        "seed": 148
+    },
+    {
+        "trial": 11,
+        "red_start": [0, 0],
+        "blue_start": [5, 4],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "hinder",
+        "seed": 3733
+    },
+    {
+        "trial": 12,
+        "red_start": [0, 0],
+        "blue_start": [1, 2],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "hinder",
+        "seed": 221
+    },
+    {
+        "trial": 13,
+        "red_start": [0, 0],
+        "blue_start": [5, 4],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "hinder",
+        "seed": 1952
+    },
+    {
+        "trial": 14,
+        "red_start": [0, 0],
+        "blue_start": [2, 2],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "hinder",
+        "seed": 14135
+    },
+    {
+        "trial": 15,
+        "red_start": [0, 0],
+        "blue_start": [4, 3],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "hinder",
+        "seed": 34
+    },
+    {
+        "trial": 16,
+        "red_start": [0, 0],
+        "blue_start": [1, 2],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "hinder",
+        "seed": 1
+    },
+    {
+        "trial": 17,
+        "red_start": [0, 0],
+        "blue_start": [0, 3],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "fake-help",
+        "seed": 951
+    },
+    {
+        "trial": 18,
+        "red_start": [0, 0],
+        "blue_start": [2, 1],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "fake-help",
+        "seed": 2079
+    },
+    {
+        "trial": 19,
+        "red_start": [0, 0],
+        "blue_start": [3, 4],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "fake-help",
+        "seed": 3014
+    },
+    {
+        "trial": 20,
+        "red_start": [0, 0],
+        "blue_start": [3, 4],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "fake-help",
+        "seed": 8949
+    },
+    {
+        "trial": 21,
+        "red_start": [0, 0],
+        "blue_start": [3, 4],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "fake-help",
+        "seed": 84
+    },
+    {
+        "trial": 22,
+        "red_start": [0, 0],
+        "blue_start": [2, 4],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "fake-help",
+        "seed": 111
+    },
+    {
+        "trial": 23,
+        "red_start": [0, 0],
+        "blue_start": [0, 3],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "fake-help",
+        "seed": 721
+    },
+    {
+        "trial": 24,
+        "red_start": [0, 0],
+        "blue_start": [0, 2],
+        "red_level": 2,
+        "blue_level": 3,
+        "blue_intention": "fake-help",
+        "seed": 8332
+    }
+]

@@ -1,0 +1,154 @@
+
+
+Red is at (0, 0), blue is at (4, 2) holding no box
+
+-----TIMESTEP 1-----
+Red's turn
+Red's belief about Blue: 0.5 help
+Q: {(0, 1): 0.821, (1, 0): 1.010, (0, 0): 0.401}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 62.5648 seconds
+
+Red is at (1, 0), blue is at (4, 2) holding no box
+
+Blue's turn
+Q: {(-1, 0): 56.455, (0, -1): 56.366, (0, 0): 54.204}
+Selecting optimal action from [(-1, 0)]
+Took action: (-1, 0)
+Time: 61.7103 seconds
+
+Red is at (1, 0), blue is at (3, 2) holding no box
+
+-----TIMESTEP 2-----
+Red's turn
+Red's belief about Blue: 0.5290988605870593 help
+Q: {(-1, 0): 0.720, (0, 1): 2.040, (1, 0): 2.158, (0, 0): 1.490}
+Selecting random action
+Took action: (0, 1)
+Time: 0.4800 seconds
+
+Red is at (1, 1), blue is at (3, 2) holding no box
+
+Blue's turn
+Q: {(-1, 0): 59.929, (1, 0): 59.929, (0, -1): 60.043, (0, 0): 59.968}
+Selecting optimal action from [(0, -1)]
+Took action: (0, -1)
+Time: 0.0002 seconds
+
+Red is at (1, 1), blue is at (3, 1) holding no box
+
+-----TIMESTEP 3-----
+Red's turn
+Red's belief about Blue: 0.5319675281737941 help
+Q: {(0, 1): 3.495, (0, 0): 2.040, (-1, 0): 0.079, (1, 0): 3.495, (0, -1): 1.881}
+Selecting optimal action from [(0, 1), (1, 0)]
+Took action: (0, 1)
+Time: 0.0003 seconds
+
+Red is at (1, 2), blue is at (3, 1) holding no box
+
+Blue's turn
+Q: {(0, 1): 63.730, (0, 0): 63.778, (-1, 0): 63.730, (1, 0): 63.730, (0, -2): 63.836}
+Selecting optimal action from [(0, -2)]
+Took action: (0, -2)
+Time: 0.0002 seconds
+
+Red is at (1, 2), blue is at (3, 1) holding box at (3, 0)
+
+-----TIMESTEP 4-----
+Red's turn
+Red's belief about Blue: 0.5319611359434158 help
+Q: {(0, 1): 5.225, (0, 0): 3.495, (-1, 0): 1.125, (1, 0): 5.225, (0, -1): 1.125}
+Selecting optimal action from [(0, 1), (1, 0)]
+Took action: (0, 1)
+Time: 0.0002 seconds
+
+Red is at (1, 3), blue is at (3, 1) holding box at (3, 0)
+
+Blue's turn
+Q: {(0, 1): 66.750, (0, -3): 66.940, (0, 0): 66.750}
+Selecting random action
+Took action: (0, 1)
+Time: 0.0003 seconds
+
+Red is at (1, 3), blue is at (3, 2) holding box at (3, 1)
+
+-----TIMESTEP 5-----
+Red's turn
+Red's belief about Blue: 0.5319547449944169 help
+Q: {(0, 1): 2.365, (0, 0): 5.225, (-1, 0): 2.365, (1, 0): 7.281, (0, -1): 2.365}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0002 seconds
+
+Red is at (2, 3), blue is at (3, 2) holding box at (3, 1)
+
+Blue's turn
+Q: {(0, -3): 67.286, (0, 0): 67.096}
+Selecting optimal action from [(0, -3)]
+Took action: (0, -3)
+Time: 0.0001 seconds
+
+Red is at (2, 3), blue is at (3, 2) holding no box
+
+-----TIMESTEP 6-----
+Red's turn
+Red's belief about Blue: 0.5319483553233522 help
+Q: {(0, 1): 3.831, (0, 0): 7.281, (-1, 0): 3.831, (1, 0): 9.718, (0, -1): 3.831}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0002 seconds
+
+Red is at (3, 3), blue is at (3, 2) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0001 seconds
+
+Red is at (3, 3), blue is at (3, 2) holding no box
+
+-----TIMESTEP 7-----
+Red's turn
+Red's belief about Blue: 0.5319419669299662 help
+Q: {(-1, 0): 5.559, (0, 1): 5.559, (1, 0): 12.600, (0, 0): 9.718}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0001 seconds
+
+Red is at (4, 3), blue is at (3, 2) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0001 seconds
+
+Red is at (4, 3), blue is at (3, 2) holding no box
+
+-----TIMESTEP 8-----
+Red's turn
+Red's belief about Blue: 0.5319355798140034 help
+Q: {(1, 0): 16.000, (0, 1): 7.592, (-1, 0): 7.592, (0, 0): 12.600}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0002 seconds
+
+Red is at (5, 3), blue is at (3, 2) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0001 seconds
+
+Red is at (5, 3), blue is at (3, 2) holding no box
+
+-----TIMESTEP 9-----
+Red's turn
+Red's belief about Blue: 0.5319291939752084 help
+Q: {(-1, 0): 9.976, (0, 1): 9.976, (0, -1): 20.000, (0, 0): 16.000}
+Selecting optimal action from [(0, -1)]
+Took action: (0, -1)
+
+Red reached goal!
+
+---------------------
+[(1, 0), (0, 1), (0, 1), (0, 1), (1, 0), (1, 0), (1, 0), (1, 0), (0, -1)]
+[(-1, 0), (0, -1), (0, -2), (0, 1), (0, -3), (0, 0), (0, 0), (0, 0)]

@@ -1,0 +1,272 @@
+[
+    {
+        "trial": 1,
+        "red_start": [0, 0],
+        "blue_start": [0, 3],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 16
+    },
+    {
+        "trial": 2,
+        "red_start": [0, 0],
+        "blue_start": [3, 4],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 2859
+    },
+    {
+        "trial": 3,
+        "red_start": [0, 0],
+        "blue_start": [3, 0],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 2
+    },
+    {
+        "trial": 4,
+        "red_start": [0, 0],
+        "blue_start": [0, 3],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 65
+    },
+    {
+        "trial": 5,
+        "red_start": [0, 0],
+        "blue_start": [4, 1],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 2
+    },
+    {
+        "trial": 6,
+        "red_start": [0, 0],
+        "blue_start": [4, 4],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 1
+    },
+    {
+        "trial": 7,
+        "red_start": [0, 0],
+        "blue_start": [2, 2],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 41
+    },
+    {
+        "trial": 8,
+        "red_start": [0, 0],
+        "blue_start": [1, 1],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 1
+    },
+    {
+        "trial": 9,
+        "red_start": [0, 0],
+        "blue_start": [3, 1],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 1
+    },
+    {
+        "trial": 10,
+        "red_start": [0, 0],
+        "blue_start": [3, 1],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 261
+    },
+    {
+        "trial": 11,
+        "red_start": [0, 0],
+        "blue_start": [4, 3],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 2
+    },
+    {
+        "trial": 12,
+        "red_start": [0, 0],
+        "blue_start": [2, 2],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 1
+    },
+    {
+        "trial": 13,
+        "red_start": [0, 0],
+        "blue_start": [2, 2],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 35
+    },
+    {
+        "trial": 14,
+        "red_start": [0, 0],
+        "blue_start": [3, 4],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 30
+    },
+    {
+        "trial": 15,
+        "red_start": [0, 0],
+        "blue_start": [0, 4],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 244
+    },
+    {
+        "trial": 16,
+        "red_start": [0, 0],
+        "blue_start": [1, 2],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 3421
+    },
+    {
+        "trial": 17,
+        "red_start": [0, 0],
+        "blue_start": [3, 3],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 1203
+    },
+    {
+        "trial": 18,
+        "red_start": [0, 0],
+        "blue_start": [0, 4],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 47
+    },
+    {
+        "trial": 19,
+        "red_start": [0, 0],
+        "blue_start": [4, 1],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 2688
+    },
+    {
+        "trial": 20,
+        "red_start": [0, 0],
+        "blue_start": [0, 1],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 2
+    },
+    {
+        "trial": 21,
+        "red_start": [0, 0],
+        "blue_start": [0, 3],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 122
+    },
+    {
+        "trial": 22,
+        "red_start": [0, 0],
+        "blue_start": [0, 2],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 65
+    },
+    {
+        "trial": 23,
+        "red_start": [0, 0],
+        "blue_start": [0, 2],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 5829
+    },
+    {
+        "trial": 24,
+        "red_start": [0, 0],
+        "blue_start": [3, 4],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 14687
+    },
+    {
+        "trial": 25,
+        "red_start": [0, 0],
+        "blue_start": [0, 3],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 187
+    },
+    {
+        "trial": 26,
+        "red_start": [0, 0],
+        "blue_start": [2, 2],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 1
+    },
+    {
+        "trial": 27,
+        "red_start": [0, 0],
+        "blue_start": [2, 4],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "hinder",
+        "seed": 171
+    },
+    {
+        "trial": 28,
+        "red_start": [0, 0],
+        "blue_start": [4, 0],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 2162
+    },
+    {
+        "trial": 29,
+        "red_start": [0, 0],
+        "blue_start": [0, 2],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 6873
+    },
+    {
+        "trial": 30,
+        "red_start": [0, 0],
+        "blue_start": [4, 2],
+        "red_level": 0,
+        "blue_level": 1,
+        "blue_intention": "help",
+        "seed": 27
+    }
+]

@@ -1,0 +1,165 @@
+
+
+Red is at (0, 0), blue is at (4, 0) holding no box
+
+-----TIMESTEP 1-----
+Red's turn
+Q: {(0, 1): -4.963, (1, 0): -4.963, (0, 0): -5.108}
+Selecting optimal action from [(0, 1), (1, 0)]
+Took action: (1, 0)
+Time: 0.0153 seconds
+
+Red is at (1, 0), blue is at (4, 0) holding no box
+
+Blue's turn
+Q: {(-1, 0): -8.452, (0, 1): -8.452, (0, 0): -8.452}
+Selecting random action
+Took action: (0, 1)
+Time: 11.4707 seconds
+
+Red is at (1, 0), blue is at (4, 1) holding no box
+
+-----TIMESTEP 2-----
+Red's turn
+Q: {(-1, 0): -4.719, (0, 1): -4.441, (1, 0): -4.441, (0, 0): -4.596}
+Selecting optimal action from [(0, 1), (1, 0)]
+Took action: (1, 0)
+Time: 0.0136 seconds
+
+Red is at (2, 0), blue is at (4, 1) holding no box
+
+Blue's turn
+Q: {(-1, 0): -8.110, (0, 2): -8.294, (0, -1): -8.110, (0, 0): -8.110}
+Selecting random action
+Took action: (0, 2)
+Time: 0.0114 seconds
+
+Red is at (2, 0), blue is at (4, 1) holding box at (4, 2)
+
+-----TIMESTEP 3-----
+Red's turn
+Q: {(-1, 0): -4.163, (0, 1): -3.871, (1, 0): -3.871, (0, 0): -4.033}
+Selecting optimal action from [(0, 1), (1, 0)]
+Took action: (1, 0)
+Time: 0.0136 seconds
+
+Red is at (3, 0), blue is at (4, 1) holding box at (4, 2)
+
+Blue's turn
+Q: {(0, 1): -6.874, (0, 3): -6.700, (0, -1): -6.695, (0, 0): -6.880}
+Selecting optimal action from [(0, -1)]
+Took action: (0, -1)
+Time: 0.0121 seconds
+
+Red is at (3, 0), blue is at (4, 0) holding box at (4, 1)
+
+-----TIMESTEP 4-----
+Red's turn
+Q: {(-1, 0): -1.239, (0, 1): 1.267, (1, 0): -0.936, (0, 0): -0.125}
+Selecting optimal action from [(0, 1)]
+Took action: (0, 1)
+Time: 0.0136 seconds
+
+Red is at (3, 1), blue is at (4, 0) holding box at (4, 1)
+
+Blue's turn
+Q: {(0, 3): -5.993, (0, 0): -6.183}
+Selecting optimal action from [(0, 3)]
+Took action: (0, 3)
+Time: 0.0112 seconds
+
+Red is at (3, 1), blue is at (4, 0) holding no box
+
+-----TIMESTEP 5-----
+Red's turn
+Q: {(-1, 0): -0.313, (0, 1): 2.445, (0, -1): -0.313, (0, 0): 0.912}
+Selecting optimal action from [(0, 1)]
+Took action: (0, 1)
+Time: 0.0136 seconds
+
+Red is at (3, 2), blue is at (4, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0108 seconds
+
+Red is at (3, 2), blue is at (4, 0) holding no box
+
+-----TIMESTEP 6-----
+Red's turn
+Q: {(-1, 0): 0.703, (1, 0): 3.734, (0, -1): 0.703, (0, 0): 2.050}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0136 seconds
+
+Red is at (4, 2), blue is at (4, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0108 seconds
+
+Red is at (4, 2), blue is at (4, 0) holding no box
+
+-----TIMESTEP 7-----
+Red's turn
+Q: {(-1, 0): 1.818, (0, 1): 5.144, (0, 0): 3.296}
+Selecting optimal action from [(0, 1)]
+Took action: (0, 1)
+Time: 0.0122 seconds
+
+Red is at (4, 3), blue is at (4, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0108 seconds
+
+Red is at (4, 3), blue is at (4, 0) holding no box
+
+-----TIMESTEP 8-----
+Red's turn
+Q: {(-1, 0): 6.681, (0, -1): 3.038, (0, 0): 4.657}
+Selecting optimal action from [(-1, 0)]
+Took action: (-1, 0)
+Time: 0.0119 seconds
+
+Red is at (3, 3), blue is at (4, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0107 seconds
+
+Red is at (3, 3), blue is at (4, 0) holding no box
+
+-----TIMESTEP 9-----
+Red's turn
+Q: {(1, 0): 4.370, (0, 1): 8.352, (0, 0): 6.140}
+Selecting optimal action from [(0, 1)]
+Took action: (0, 1)
+Time: 0.0115 seconds
+
+Red is at (3, 4), blue is at (4, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0106 seconds
+
+Red is at (3, 4), blue is at (4, 0) holding no box
+
+-----TIMESTEP 10-----
+Red's turn
+Q: {(1, 0): 10.164, (0, -1): 5.821, (0, 0): 7.751}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0114 seconds
+
+Red is at (4, 4), blue is at (4, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0108 seconds
+
+Red is at (4, 4), blue is at (4, 0) holding no box
+
+---------------------
+[(1, 0), (1, 0), (1, 0), (0, 1), (0, 1), (1, 0), (0, 1), (-1, 0), (0, 1), (1, 0)]
+[(0, 1), (0, 2), (0, -1), (0, 3), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]

@@ -1,0 +1,157 @@
+
+
+Red is at (0, 0), blue is at (2, 1) holding no box
+
+-----TIMESTEP 1-----
+Red's turn
+Q: {(0, 1): 11.655, (1, 0): 11.655, (0, 0): 9.817}
+Selecting optimal action from [(0, 1), (1, 0)]
+Took action: (0, 1)
+Time: 0.0109 seconds
+
+Red is at (0, 1), blue is at (2, 1) holding no box
+
+Blue's turn
+Took action: (1, 0)
+Time: 0.0092 seconds
+
+Red is at (0, 1), blue is at (3, 1) holding no box
+
+-----TIMESTEP 2-----
+Red's turn
+Q: {(0, 1): 9.817, (1, 0): 13.606, (0, -1): 9.817, (0, 0): 11.655}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0094 seconds
+
+Red is at (1, 1), blue is at (3, 1) holding no box
+
+Blue's turn
+Took action: (0, 2)
+Time: 0.0092 seconds
+
+Red is at (1, 1), blue is at (3, 1) holding box at (3, 2)
+
+-----TIMESTEP 3-----
+Red's turn
+Q: {(0, 1): 11.655, (0, 0): 13.606, (-1, 0): 11.655, (1, 0): 15.660, (0, -1): 11.655}
+Selecting optimal action from [(1, 0)]
+Took action: (1, 0)
+Time: 0.0107 seconds
+
+Red is at (2, 1), blue is at (3, 1) holding box at (3, 2)
+
+Blue's turn
+Took action: (0, -1)
+Time: 0.0092 seconds
+
+Red is at (2, 1), blue is at (3, 0) holding box at (3, 1)
+
+-----TIMESTEP 4-----
+Red's turn
+Q: {(-1, 0): 10.284, (0, 1): 10.284, (0, -1): 6.840, (0, 0): 9.974}
+Selecting optimal action from [(-1, 0), (0, 1)]
+Took action: (0, 1)
+Time: 0.0097 seconds
+
+Red is at (2, 2), blue is at (3, 0) holding box at (3, 1)
+
+Blue's turn
+Took action: (0, 3)
+Time: 0.0084 seconds
+
+Red is at (2, 2), blue is at (3, 0) holding no box
+
+-----TIMESTEP 5-----
+Red's turn
+Q: {(-1, 0): 9.608, (0, -1): 8.143, (0, 0): 8.532}
+Selecting optimal action from [(-1, 0)]
+Took action: (-1, 0)
+Time: 0.0099 seconds
+
+Red is at (1, 2), blue is at (3, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0088 seconds
+
+Red is at (1, 2), blue is at (3, 0) holding no box
+
+-----TIMESTEP 6-----
+Red's turn
+Q: {(0, 1): 9.817, (0, 0): 8.128, (-1, 0): 5.566, (1, 0): 7.080, (0, -1): 7.080}
+Selecting optimal action from [(0, 1)]
+Took action: (0, 1)
+Time: 0.0104 seconds
+
+Red is at (1, 3), blue is at (3, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0087 seconds
+
+Red is at (1, 3), blue is at (3, 0) holding no box
+
+-----TIMESTEP 7-----
+Red's turn
+Q: {(0, 1): 5.985, (0, 0): 8.505, (-1, 0): 5.985, (1, 0): 11.655, (0, -1): 6.931}
+Selecting random action
+Took action: (0, 1)
+Time: 0.0101 seconds
+
+Red is at (1, 4), blue is at (3, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0087 seconds
+
+Red is at (1, 4), blue is at (3, 0) holding no box
+
+-----TIMESTEP 8-----
+Red's turn
+Q: {(-1, 0): 3.543, (1, 0): 7.470, (0, -1): 7.470, (0, 0): 5.288}
+Selecting optimal action from [(1, 0), (0, -1)]
+Took action: (0, -1)
+Time: 0.0114 seconds
+
+Red is at (1, 3), blue is at (3, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0086 seconds
+
+Red is at (1, 3), blue is at (3, 0) holding no box
+
+-----TIMESTEP 9-----
+Red's turn
+Q: {(0, 1): 4.814, (0, 0): 6.695, (-1, 0): 4.814, (1, 0): 9.047, (0, -1): 9.047}
+Selecting optimal action from [(1, 0), (0, -1)]
+Took action: (0, -1)
+Time: 0.0100 seconds
+
+Red is at (1, 2), blue is at (3, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0085 seconds
+
+Red is at (1, 2), blue is at (3, 0) holding no box
+
+-----TIMESTEP 10-----
+Red's turn
+Q: {(0, 1): 6.169, (0, 0): 8.186, (-1, 0): 6.169, (1, 0): 10.708, (0, -1): 10.708}
+Selecting optimal action from [(1, 0), (0, -1)]
+Took action: (0, -1)
+Time: 0.0098 seconds
+
+Red is at (1, 1), blue is at (3, 0) holding no box
+
+Blue's turn
+Took action: (0, 0)
+Time: 0.0086 seconds
+
+Red is at (1, 1), blue is at (3, 0) holding no box
+
+---------------------
+[(0, 1), (1, 0), (1, 0), (0, 1), (-1, 0), (0, 1), (0, 1), (0, -1), (0, -1), (0, -1)]
+[(1, 0), (0, 2), (0, -1), (0, 3), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]

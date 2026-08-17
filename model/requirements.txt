@@ -1,0 +1,7 @@
+imageio==2.37.0
+networkx==3.4.2
+numpy==2.3.2
+pandas==2.3.2
+pygame==2.6.1
+pygifsicle==1.1.0
+scipy==1.16.1

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <title> Psychology Experiment </title>
+    
+    <link rel="stylesheet" href='css/jspsych.css' />
+    <link rel="stylesheet" href='css/jquery-ui-edit.css' />
+    <link rel="stylesheet" href='css/jquery-ui-slider-pips-edit.css' />
+   
+    <script src='js/jspsych.js'></script>
+    <script src='js/jquery.min.js'></script>
+    <script src='js/jquery-ui.min.js'></script>
+    <script src='js/jquery-ui-slider-pips.js'></script>
+    <script src='js/timeme.min.js'></script>
+    <script src='https://proliferate.alps.science/static/js/proliferate.js'></script>
+    <script src='js/plugin-preload.js'></script>
+    <script src='js/plugin-instructions.js'></script>
+    <script src='js/plugin-html-button-response.js'></script>
+    <script src='js/plugin-survey-multi-choice.js'></script>
+    <script src='js/plugin-survey-html-form.js'></script>
+
+    <script src='js/plugin-int.js'></script>
+    <script src='js/demographic_form.js'></script>
+    <script src='js/trial_info.js'></script>
+    <script src='js/utils.js'></script>
+    <script src='instructions/text.js'></script>
+</head>
+
+</body></body>
+
+<script>
+
+    TimeMe.initialize({
+        currentPageName: 'page',
+        idleTimeoutInSeconds: 15
+    });
+
+    // -----------------------------------------------------
+    // initialize jspsych
+    // -----------------------------------------------------
+    var jsPsych = initJsPsych({
+        show_progress_bar: true,
+        auto_update_progress_bar: false,
+        on_finish: () => {
+            time = TimeMe.getTimeOnPageInSeconds('page');
+
+            let data = jsPsych.data.get();
+            let values_trials = data.filter({trial_type: 'judge-intention'}).values();
+            let values_participant = data.filter({trial_type: 'survey-html-form'}).values();
+
+            let trials = [];
+            for (var i = 0; i < values_trials.length; i++) {
+                trials.push({
+                    'trial': values_trials[i]['trial'],
+                    'int': values_trials[i]['response']
+                });
+            }
+
+            let participant = values_participant[0]['response'];
+            participant.time = time;
+
+            proliferate.submit({
+                "trials": trials,
+                "participants": [participant],
+            });
+
+            $('#jspsych-content').css('margin-top', 'auto');
+            $('#jspsych-content').html('<div style="margin: auto;"> <p>' +
+                ' Thank you for participating in this experiment! </p>' +
+                '<p> Redirecting you back to Prolific... </p>');
+            setTimeout(function(){}, 200);
+        }
+    });
+
+    // -----------------------------------------------------
+    // instructions and comprehension check
+    // -----------------------------------------------------
+
+    let preload_trial = {
+        type: jsPsychPreload,
+        images: instruction_images.concat(trial_images)
+    };
+
+    let instructions = {
+        type: jsPsychInstructions,
+        pages: instruction_pages,
+        show_clickable_nav: true,
+        on_start: function() { jsPsych.setProgressBar(0.02); },
+        on_finish: function() { jsPsych.setProgressBar(0.10); }
+    };
+
+    var instructions_trial = {
+        type: judgeIntention,
+        trial: 0,
+        title: 'Example',
+        on_finish: function() { jsPsych.setProgressBar(0.12); }
+    }
+
+    var instructions_last = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: instructions_last,
+        choices: ['Continue'],
+        is_narrow: true,
+        on_finish: function() { jsPsych.setProgressBar(0.14); }
+    }
+ 
+    var comprehension_qs = {
+        type: jsPsychSurveyMultiChoice,
+        questions: [
+            {
+                prompt: comprehension1,
+                options: options1,
+                horizontal: true
+            },
+            {
+                prompt: comprehension2,
+                options: options2,
+                horizontal: true
+            },
+            {
+                prompt: comprehension3,
+                options: options3,
+                horizontal: true
+            },
+            {
+                prompt: comprehension4,
+                options: options4,
+                horizontal: true
+            },
+        ],
+        preamble: 'Please answer a few comprehension questions so we know' +
+            ' that you understand the setup.',
+        on_finish: function(data){
+            data.correct = (data.response.Q0 == 'False') &&
+                           (data.response.Q1 == '3 only') &&
+                           (data.response.Q2 == 'True') &&
+                           (data.response.Q3 == '2 only')
+        }
+    }
+    
+    var fail_comprehension = {
+        timeline: [{
+            type: jsPsychHtmlButtonResponse,
+            stimulus: 'Unfortunately, you missed some of the comprehension ' +
+                'questions.</p> <p> Please review the instructions again.',
+            choices: ['Review'],
+        }],
+        conditional_function: function(){
+            var data = jsPsych.data.get().last(1).values()[0];
+            return !(data.correct);
+        }
+    }
+
+    var loop_node = {
+        timeline: [
+            instructions,
+            instructions_trial,
+            instructions_last,
+            comprehension_qs,
+            fail_comprehension
+        ],
+        loop_function: function(data){
+            var data = jsPsych.data.get().last(1).values()[0];
+            return !(data.correct);
+        }
+    }
+    
+
+    // -----------------------------------------------------
+    // experiment trials
+    // -----------------------------------------------------
+
+    // add transition to start
+    var trials_start1 = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: start_prompt1,
+        choices: ['Continue'],
+        is_narrow: true,
+        on_finish: function() { jsPsych.setProgressBar(0.2); },
+    };
+    
+    var trials_start2 = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: start_prompt2,
+        choices: ['Start'],
+        is_narrow: true,
+        on_finish: function() { jsPsych.setProgressBar(0.22); },
+    };
+
+    var num_trials = trial_info.length;
+    // precompute trial order (rather than via jsPsych) so it can be displayed per trial
+    var trial_order = generate_trial_order(num_trials);
+
+    var trials = {
+        timeline_variables: trial_info,
+        timeline: [
+            {
+                type: jsPsychInstructions,
+                pages: jsPsych.timelineVariable('pages'),
+                header: function() {
+                    var html = '<h2> Scenario ' + (trial_order.indexOf(jsPsych
+                        .timelineVariable('trial', true) - 1) + 1) + '</h2>';
+                    return html;
+                },
+                show_clickable_nav: true,
+                button_label_previous: '',
+                button_label_next: ''
+            },
+            {
+                type: judgeIntention,
+                trial: jsPsych.timelineVariable('trial'),
+                title: function() {
+                    var html = '<h2> Scenario ' + (trial_order.indexOf(jsPsych
+                        .timelineVariable('trial', true) - 1) + 1) + '</h2>';
+                    return html;
+                },
+            },
+        ],
+        choices: ['Continue'],
+        sample: {
+            type: 'custom',
+            fn: function(t) {
+                return trial_order;
+            },
+        },
+        on_finish: function() {
+            var prog = jsPsych.getProgressBarCompleted();
+            jsPsych.setProgressBar(prog + 0.01);
+        }
+    };
+
+    // -----------------------------------------------------
+    // compile timeline
+    // -----------------------------------------------------
+    let timeline = [];
+    timeline.push(preload_trial);
+    timeline.push(loop_node);
+    timeline.push(trials_start1);
+    timeline.push(trials_start2);
+    timeline.push(trials);
+    timeline.push(demographic_form);
+
+    // -----------------------------------------------------
+    // run timeline
+    // -----------------------------------------------------
+    jsPsych.run(timeline);
+
+
+</script>
+
+</html>

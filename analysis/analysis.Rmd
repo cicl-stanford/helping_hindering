@@ -1,0 +1,1787 @@
+---
+title: "Helping and hindering as counterfactual difference-making"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  bookdown::html_document2:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    theme: cosmo
+    highlight: tango
+---
+
+# Setup
+
+```{r setup, include = F, message = F, warning = F}
+require(knitr)         # for knitting
+library(ggstatsplot)   # extension of ggplot2
+library(lme4)          # for mixed effects models
+library(lmerTest)      # for p values in lmer
+library(DT)            # for datatable() function
+library(brms)          # for Bayesian regression models
+library(Metrics)       # for RMSE
+library(Hmisc)         # for bootstrapped confidence intervals
+library(xtable)        # for converting to LaTex tables
+library(scales)        # hue palette
+library(showtext)      # for fonts
+library(broom.mixed)   # for augmenting fitted models
+library(ggrepel)       # avoid overlap in geom_text
+library(patchwork)     # for multiple plots
+library(png)           # for working with images
+library(grid)          # for grob
+library(egg)           # for geom_custom
+library(ggtext)        # for styling ggplot text
+library(ggnewscale)    # for multiple scales in the same plot
+library(tidyverse)     # for everything else
+
+knitr::opts_chunk$set(echo = T, warning = F, message = F)
+
+# set default plot theme
+theme_set(theme_classic() +
+            theme(text = element_text(size = 14)))
+
+# suppress warnings about grouping
+options(dplyr.summarise.inform = F)
+options(xtable.floating = F)
+options(xtable.timestamp = "")
+options(readr.show_col_types = F)
+
+set.seed(1)
+
+data_dir    = '../data/'
+figures_dir = '../figures/'
+info_dir    = function(exp) str_c('../model/trial_info/exp', exp, '/')
+```
+
+# Helper functions
+
+## Data processing
+
+```{r}
+read_trials = function(exp, condition) {
+  read_csv(str_c(data_dir, 'experiment', exp, '/', condition, '/trials.csv')) %>%
+    filter(trial > 0) %>%
+    drop_na(trial) %>%
+    mutate(id = factor(id))
+}
+
+read_participants = function(exp, condition) {
+  read_csv(str_c(data_dir, 'experiment', exp, '/', condition, '/participants.csv')) %>%
+    mutate(id = factor(id))
+}
+```
+
+## Demographics
+
+```{r}
+print_demographics = function(data) {
+  data %>% group_by(gender) %>% summarise(n = n()) %>% print()
+  print(sprintf('age: M = %.0f, SD = %.0f',
+                mean(data$age, na.rm = T),
+                sd(data$age, na.rm = T)))
+  data %>% group_by(race) %>% summarise(n = n()) %>% print()
+  data %>% group_by(ethnicity) %>% summarise(n = n()) %>% print()
+  print(sprintf('time: %.1f minutes (SD = %.1f)',
+                mean(data$time, na.rm = T)/60,
+                sd(data$time, na.rm = T)/60))
+}
+```
+
+## Scatter plot
+
+```{r}
+scatterplot = function(data, x, x_label, y, y_label) {
+  r    = cor(data[[str_c(x, "_mean")]], data[[str_c(y, "_mean")]])
+  rmse = rmse(data[[str_c(x, "_mean")]], data[[str_c(y, "_mean")]])
+
+  g = ggplot(data = data,
+             aes(x = get(str_c(x, "_mean")),
+                 y = get(str_c(y, "_mean")))) +
+    geom_abline(intercept = 0, slope = 1, linetype = 2, size = 0.2) +
+    geom_linerange(size = 0.7,
+                   mapping = aes(ymin = get(str_c(y, "_low")),
+                                 ymax = get(str_c(y, "_high"))),
+                   color = 'lightgray') +
+    geom_errorbarh(mapping = aes(xmin = get(str_c(x, "_low")),
+                                 xmax = get(str_c(x, "_high"))),
+                   color = 'lightgray', height = 0) +
+    geom_point(size = 1.5, fill = 'black') +
+    geom_text(label = sprintf('RMSE = %.2f\nr = %.2f', rmse, r),
+              hjust = 0, x = 0, y = 95, size = 4,
+              check_overlap = T) +
+    scale_x_continuous(name = x_label, limits = c(0, 100)) +
+    scale_y_continuous(name = y_label, limits = c(0, 100)) +
+    coord_fixed(ratio = 1, clip = 'off') +
+    theme(legend.position = "none",
+          text = element_text(size = 16),
+          axis.title.x = element_markdown(size = 16),
+          axis.title.y = element_markdown(size = 16),
+          aspect.ratio = 1)
+
+  return(g)
+}
+```
+
+# Experiment 1
+
+## Data
+
+### Trial info
+
+```{r}
+trial.info.exp1 = read_csv(str_c(info_dir(1), 'model_predictions.csv')) %>%
+  rename(cf_model = counterfactual,
+         int_model = intention,
+         effort_model = effort) %>%
+  mutate(outcome = factor(outcome, levels = c('success', 'failure')),
+         cf_model = cf_model * 100,
+         int_model = int_model * 100,
+         effort_model = 10*effort_model,
+         cf_model_recode = ifelse(outcome == 'success',
+                                  100 - cf_model, cf_model),
+         int_model_recode = ifelse(outcome == 'success',
+                                   int_model, 100 - int_model))
+
+images.exp1 = data.frame(trial = 1:nrow(trial.info.exp1)) %>%
+  mutate(grob = map(
+    .x = trial,
+    .f = ~ readPNG(str_c(figures_dir, 'trial_stills/experiment1/', .x, '.png'))))
+```
+
+### Responsibility
+
+Participants were asked: “What factors influenced how you decided to respond? Do you have any questions or comments regarding the experiment?”
+```{r}
+data.exp1.resp = read_trials(1, 'responsibility')
+data.exp1.resp.participants = read_participants(1, 'responsibility')
+
+data.exp1.resp.participants %>%
+  select(id, feedback) %>%
+  datatable(rownames = F)
+```
+
+### Counterfactual
+
+```{r}
+data.exp1.cf = read_trials(1, 'counterfactual') %>%
+  left_join(trial.info.exp1 %>%
+              select(trial, outcome),
+            by = 'trial') %>%
+  mutate(cf_recode = ifelse(outcome == 'success',
+                            100 - response, response))
+
+data.exp1.cf.participants = read_participants(1, 'counterfactual')
+
+data.exp1.cf.participants %>%
+  select(id, feedback) %>%
+  datatable(rownames = F)
+```
+
+### Intention
+
+```{r}
+data.exp1.int = read_trials(1, 'intention') %>%
+  left_join(trial.info.exp1 %>%
+              select(trial, outcome),
+            by = 'trial') %>%
+  mutate(int_recode = ifelse(outcome == 'success',
+                             response, 100 - response))
+
+data.exp1.int.participants = read_participants(1, 'intention')
+
+data.exp1.int.participants %>%
+  select(id, feedback) %>%
+  datatable(rownames = F)
+```
+
+### Effort
+
+```{r}
+data.exp1.eff = read_trials(1, 'effort')
+data.exp1.eff.participants = read_participants(1, 'effort')
+
+data.exp1.eff.participants %>%
+  select(id, feedback) %>%
+  datatable(rownames = F)
+```
+
+## Demographics
+
+```{r}
+print_demographics(data.exp1.resp.participants %>%
+                     rbind(data.exp1.cf.participants) %>%
+                     rbind(data.exp1.int.participants) %>%
+                     rbind(data.exp1.eff.participants))
+```
+
+## Analysis
+
+### Model components
+
+```{r}
+list(cf  = list(judgment = data.exp1.cf %>%
+                  group_by(trial) %>%
+                  summarise(mean = mean(response)),
+                model = trial.info.exp1 %>%
+                  select(trial, mean = cf_model)),
+     int = list(judgment = data.exp1.int %>%
+                 group_by(trial) %>%
+                 summarise(mean = mean(response)),
+               model = trial.info.exp1 %>%
+                 select(trial, mean = int_model)),
+    eff = list(judgment = data.exp1.eff %>%
+                 group_by(trial) %>%
+                 summarise(mean = mean(response)),
+               model = trial.info.exp1 %>%
+                 select(trial, mean = effort_model))) %>%
+  map_dfr(.id = 'condition',
+          function(x) {
+            d = left_join(x$judgment, x$model,
+                          by = 'trial',
+                          suffix = c('_judgment', '_model'))
+            tibble(r = cor(d$mean_judgment, d$mean_model),
+                   rmse = rmse(d$mean_judgment, d$mean_model))}
+          )
+```
+
+### Responsibility model
+
+Setting up data:
+```{r}
+data.exp1.modeling = data.exp1.resp %>%
+  left_join(data.exp1.cf %>%
+              group_by(trial) %>%
+              summarise(cf_recode = mean(cf_recode)),
+            by = 'trial') %>%
+  left_join(data.exp1.int %>%
+              group_by(trial) %>%
+              summarise(int_recode = mean(int_recode)),
+            by = 'trial') %>%
+  left_join(data.exp1.eff %>%
+              group_by(trial) %>%
+              summarise(effort = mean(response)),
+            by = 'trial') %>%
+  left_join(trial.info.exp1, by = 'trial')
+```
+
+Model fitting:
+```{r}
+fit.exp1.cf = brm(
+  formula = resp ~ 1 + cf_recode + (1 | id),
+  data = data.exp1.modeling,
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.exp1.cf")
+
+summary(fit.exp1.cf)
+
+fit.exp1.int = brm(
+  formula = resp ~ 1 + int_recode + (1 | id),
+  data = data.exp1.modeling,
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.exp1.int")
+
+summary(fit.exp1.int)
+
+fit.exp1.cf_int = brm(
+  formula = resp ~ 1 + cf_recode + int_recode + (1 | id),
+  data = data.exp1.modeling,
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.exp1.cf_int")
+
+summary(fit.exp1.cf_int)
+
+fit.exp1.cf_eff = brm(
+  formula = resp ~ 1 + cf_recode + effort + (1 | id),
+  data = data.exp1.modeling,
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.exp1.cf_eff")
+
+summary(fit.exp1.cf_eff)
+
+fit.exp1.heuristic = brm(
+  formula = resp ~ 1 + outcome + red_steps + blue_steps + box_steps + (1 | id),
+  data = data.exp1.modeling,
+  iter = 2000, seed = 1,
+  file = "cache/fit.exp1.heuristic")
+
+summary(fit.exp1.heuristic)
+```
+
+Model comparison:
+```{r}
+fit.exp1.cf = add_criterion(
+  fit.exp1.cf,
+  criterion = "loo",
+  reloo = T,
+  file = "cache/fit.exp1.cf")
+
+fit.exp1.int = add_criterion(
+  fit.exp1.int,
+  criterion = "loo",
+  reloo = T,
+  file = "cache/fit.exp1.int")
+
+fit.exp1.cf_int = add_criterion(
+  fit.exp1.cf_int,
+  criterion = "loo",
+  reloo = T,
+  file = "cache/fit.exp1.cf_int")
+
+fit.exp1.cf_eff = add_criterion(
+  fit.exp1.cf_eff,
+  criterion = "loo",
+  reloo = T,
+  file = "cache/fit.exp1.cf_eff")
+
+fit.exp1.heuristic = add_criterion(
+  fit.exp1.heuristic,
+  criterion = "loo",
+  reloo = T,
+  file = "cache/fit.exp1.heuristic")
+
+loo_compare(fit.exp1.cf,
+            fit.exp1.int,
+            fit.exp1.cf_int,
+            fit.exp1.cf_eff,
+            fit.exp1.heuristic)
+```
+
+Individual model fitting and comparison:
+```{r eval = F}
+fit.exp1.cf_individual = brm(
+  formula = resp ~ 1 + cf_recode,
+  data = data.exp1.modeling %>% filter(id == 1),
+  seed = 1,
+  file = "cache/fit.exp1.cf_individual")
+
+fit.exp1.int_individual = brm(
+  formula = resp ~ 1 + int_recode,
+  data = data.exp1.modeling %>% filter(id == 1),
+  seed = 1,
+  file = "cache/fit.exp1.int_individual")
+
+fit.exp1.cf_int_individual = brm(
+  formula = resp ~ 1 + cf_recode + int_recode,
+  data = data.exp1.modeling %>% filter(id == 1),
+  seed = 1,
+  file = "cache/fit.exp1.cf_int_individual")
+
+fit.exp1.cf_effort_individual = brm(
+  formula = resp ~ 1 + cf_recode + effort,
+  data = data.exp1.modeling %>% filter(id == 1),
+  seed = 1,
+  file = "cache/fit.exp1.cf_effort_individual")
+
+fit.exp1.heuristic_individual = brm(
+  formula = resp ~ 1 + outcome + red_steps + blue_steps + box_steps,
+  data = data.exp1.modeling %>% filter(id == 1),
+  seed = 1,
+  file = "cache/fit.exp1.heuristic_individual")
+
+data.exp1.fits = data.exp1.modeling %>%
+  group_by(id) %>% nest() %>% ungroup() %>%
+  mutate(
+    fit_cf = map(.x = data,
+                 .f = ~ update(fit.exp1.cf_individual,
+                               newdata = .x,
+                               seed = 1)),
+    fit_int = map(.x = data,
+                  .f = ~ update(fit.exp1.int_individual,
+                                newdata = .x,
+                                seed = 1)),
+    fit_cf_int = map(.x = data,
+                     .f = ~ update(fit.exp1.cf_int_individual,
+                                   newdata = .x,
+                                   seed = 1)),
+    fit_cf_effort = map(.x = data,
+                        .f = ~ update(fit.exp1.cf_effort_individual,
+                                      newdata = .x,
+                                      seed = 1)),
+    fit_heuristic = map(.x = data,
+                        .f = ~ update(fit.exp1.heuristic_individual,
+                                      newdata = .x,
+                                      seed = 1))) %>%
+  mutate(
+    fit_cf = map(.x = fit_cf,
+                 .f = ~ add_criterion(.x, criterion = "loo")),
+    fit_int = map(.x = fit_int,
+                  .f = ~ add_criterion(.x, criterion = "loo")),
+    fit_cf_int = map(.x = fit_cf_int,
+                     .f = ~ add_criterion(.x, criterion = "loo")),
+    fit_cf_effort = map(.x = fit_cf_effort,
+                        .f = ~ add_criterion(.x, criterion = "loo")),
+    fit_heuristic = map(.x = fit_heuristic,
+                        .f = ~ add_criterion(.x, criterion = "loo")),
+    model_comparison = pmap(.l = list(cf = fit_cf,
+                                      int = fit_int,
+                                      cf_int = fit_cf_int,
+                                      cf_effort = fit_cf_effort,
+                                      heuristic = fit_heuristic),
+                            .f = ~ loo_compare(..1, ..2, ..3, ..4, ..5)),
+    best_model = map_chr(.x = model_comparison,
+                         .f = ~ rownames(.) %>% .[1]),
+    best_model = factor(best_model,
+                        levels = c("..1", "..2", "..3", "..4", "..5"),
+                        labels = c("cf", "int", "cf_int", "cf_effort", "heuristic")))
+
+save(list = c("data.exp1.fits"),
+     file = 'cache/exp1.model_fits.RData')
+```
+
+```{r}
+load(file = 'cache/exp1.model_fits.RData')
+
+data.exp1.fits %>%
+  count(best_model) %>%
+  arrange(desc(n))
+```
+
+## Figures
+
+```{r}
+exp1.conditions = c('int', 'cf', 'eff', 'resp')
+
+exp1.condition_labels = c('int' = 'Intention',
+                          'cf' = 'Counterfactual',
+                          'eff' = 'Effort',
+                          'resp' = 'Responsibility')
+
+exp1.condition_colors = c('int' = 'tan2',
+                          'cf' = 'orchid3',
+                          'eff' = 'aquamarine3',
+                          'resp' = 'deepskyblue')
+
+data.exp1.long = data.exp1.resp %>%
+  mutate(condition = 'resp') %>%
+  rbind(data.exp1.int %>%
+          select(-outcome, -int_recode) %>%
+          mutate(condition = 'int')) %>%
+  rbind(data.exp1.cf %>%
+          select(-outcome, -cf_recode) %>%
+          mutate(condition = 'cf')) %>%
+  rbind(data.exp1.eff %>%
+          mutate(condition = 'eff')) %>%
+  mutate(condition = factor(condition, levels = exp1.conditions))
+
+data.exp1.model = trial.info.exp1 %>%
+  select(trial, int = int_model,
+         cf = cf_model, eff = effort_model) %>%
+  left_join(data.exp1.modeling %>%
+              cbind(fit.exp1.cf_int %>%
+                      fitted(newdata = data.exp1.modeling,
+                             re_formula = NA) %>%
+                      as_tibble() %>%
+                      select(pred = Estimate)) %>%
+              distinct(trial, pred) %>%
+              rename(resp = pred),
+            by = 'trial') %>%
+  pivot_longer(cols = -trial,
+               names_to = 'condition',
+               values_to = 'prediction') %>%
+  mutate(condition = factor(condition, levels = exp1.conditions))
+```
+
+### All trials
+
+```{r fig.width = 12, fig.height = 16}
+ggplot(data = data.exp1.long,
+       mapping = aes(x = condition,
+                     y = response,
+                     fill = condition)) +
+  # mean judgments
+  stat_summary(fun = "mean",
+               geom = "bar",
+               color = "black",
+               alpha = 0.8,
+               linewidth = 0.1) +
+  # individual participant judgments
+  geom_point(size = 1,
+             stroke = 0.5,
+             shape = 21,
+             color = 'gray40',
+             alpha = 0.5,
+             position = position_jitter(height = 0, width = 0.2),
+             show.legend = F) +
+  # error bars
+  stat_summary(fun.data = mean_cl_boot,
+               geom = "linerange",
+               color = "black",
+               linewidth = 1) +
+  # model predictions
+  geom_point(data = data.exp1.model,
+             mapping = aes(y = prediction),
+             size = 3,
+             stroke = 0.6,
+             shape = 21,
+             show.legend = F) +
+  # trial images
+  geom_custom(data = images.exp1,
+              inherit.aes = F,
+              mapping = aes(data = grob,
+                            x = -Inf, y = Inf),
+              grob_fun = function(x) rasterGrob(
+                x, interpolate = T,
+                vjust = 0, hjust = 0)) +
+  # trial image numbers
+  geom_text(aes(label = trial, x = 0.75, y = 124),
+            color = 'black', size = 6,
+            check_overlap = T) +
+  facet_wrap(~ trial, nrow = 5, scales = 'free_x') +
+  scale_fill_manual(values = exp1.condition_colors,
+                    labels = exp1.condition_labels) +
+  scale_y_continuous(name = 'Judgments',
+                     breaks = seq(0, 100, 25),
+                     expand = expansion(mult = 0.01)) +
+  coord_cartesian(clip = "off",
+                  ylim = c(0, 110)) +
+  theme(text = element_text(size = 16),
+        legend.position = 'bottom',
+        legend.direction = 'horizontal',
+        legend.text = element_text(
+          size = 16,
+          margin = margin(r = 1, l = 0.2, unit = 'cm')),
+        legend.title = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        panel.grid.major.y = element_line(),
+        panel.spacing.y = unit(4.1, "cm"),
+        plot.margin = margin(t = 3.8, l = 0, r = 0, b = 0, unit = 'cm'))
+
+# ggsave(str_c(figures_dir, 'exp1_bar_all.pdf'),
+#        width = 12, height = 16)
+```
+
+### Selected trials
+
+```{r fig.width = 12, fig.height = 3.5}
+selected_trials = c(13, 7, 2, 23, 16, 29)
+
+ggplot(data = data.exp1.long %>%
+         filter(trial %in% selected_trials) %>%
+         mutate(trial = factor(trial, levels = selected_trials),
+                trial_label = as.integer(trial)),
+       mapping = aes(x = condition,
+                     y = response,
+                     fill = condition)) +
+  # mean judgments
+  stat_summary(fun = "mean",
+               geom = "bar",
+               color = "black",
+               alpha = 0.8,
+               linewidth = 0.1) +
+  # individual participant judgments
+  geom_point(size = 1,
+             stroke = 0.5,
+             shape = 21,
+             color = 'gray40',
+             alpha = 0.5,
+             position = position_jitter(height = 0, width = 0.2),
+             show.legend = F) +
+  # error bars
+  stat_summary(fun.data = mean_cl_boot,
+               geom = "linerange",
+               color = "black",
+               linewidth = 1) +
+  # model predictions
+  geom_point(data = data.exp1.model %>%
+               filter(trial %in% selected_trials),
+             mapping = aes(y = prediction),
+             size = 3,
+             stroke = 0.6,
+             shape = 21,
+             show.legend = F) +
+  # trial images
+  geom_custom(data = images.exp1 %>%
+                filter(trial %in% selected_trials),
+              inherit.aes = F,
+              mapping = aes(data = grob, x = -Inf, y = Inf),
+              grob_fun = function(x) rasterGrob(
+                x, interpolate = T,
+                vjust = 0, hjust = 0,
+                height = unit(3.8, 'cm'))) +
+  # trial image labels
+  geom_text(aes(label = trial_label, x = 0.8, y = 126),
+            color = 'black', size = 7,
+            check_overlap = T) +
+  facet_wrap(~ trial, nrow = 1, scales = 'free_x') +
+  scale_fill_manual(values = exp1.condition_colors,
+                    labels = exp1.condition_labels) +
+  scale_y_continuous(name = 'Judgments',
+                     breaks = seq(0, 100, 25),
+                     expand = expansion(mult = 0.01)) +
+  coord_cartesian(clip = "off",
+                  ylim = c(0, 110)) +
+  theme(text = element_text(size = 16),
+        legend.position = 'bottom',
+        legend.direction = 'horizontal',
+        legend.text = element_text(
+          size = 16,
+          margin = margin(r = 1, l = 0.2, unit = 'cm')),
+        legend.title = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        panel.grid.major.y = element_line(),
+        plot.margin = margin(t = 3.9, l = 0, r = 0, b = 0, unit = 'cm'))
+
+# ggsave(str_c(figures_dir, 'exp1_bar_select.pdf'),
+#        width = 12, height = 3.5)
+```
+
+### Responsibility
+
+```{r fig.width = 12, fig.height = 2.75}
+scatterplot.exp1 = function(fit, x_label, y_label = '') {
+  data.exp1.modeling %>%
+    cbind(fit %>%
+            fitted(newdata = data.exp1.modeling,
+                   re_formula = NA) %>%
+            as_tibble() %>%
+            select(pred_resp_mean = Estimate)) %>%
+    distinct(trial, pred_resp_mean) %>%
+    left_join(data.exp1.resp %>%
+                group_by(trial) %>%
+                summarise(resp_mean = mean(response),
+                          resp_low = smean.cl.boot(response)[2],
+                          resp_high = smean.cl.boot(response)[3]),
+              by = 'trial') %>%
+    mutate(pred_resp_mean = pmax(pmin(pred_resp_mean, 100), 0),
+           pred_resp_low = pred_resp_mean,
+           pred_resp_high = pred_resp_mean) %>%
+    scatterplot('pred_resp', x_label, 'resp', y_label)
+}
+
+plot.exp1.int = scatterplot.exp1(
+  fit.exp1.int,
+  '<span style="color:tan2">Intention</span>',
+  'Responsibility')
+plot.exp1.cf = scatterplot.exp1(
+  fit.exp1.cf,
+  '<span style="color:orchid3">Counterfactual</span>')
+plot.exp1.cf_int = scatterplot.exp1(
+  fit.exp1.cf_int,
+  '<span style="color:tan2">Intention</span> + <br><span style="color:orchid3">Counterfactual</span>')
+plot.exp1.cf_eff = scatterplot.exp1(
+  fit.exp1.cf_eff,
+  '<span style="color:aquamarine3">Effort</span> + <br><span style="color:orchid3">Counterfactual</span>')
+plot.exp1.heuristic  = scatterplot.exp1(
+  fit.exp1.heuristic,
+  'Heuristic')
+
+plot.exp1.int + plot.exp1.cf + plot.exp1.cf_int + plot.exp1.cf_eff + plot.exp1.heuristic +
+  plot_layout(nrow = 1, widths = c(1, 1, 1, 1, 1)) &
+  theme(plot.margin = margin(t = 0.2, r = 0.1, unit = 'cm'))
+
+# ggsave(str_c(figures_dir, 'exp1_responsibility.pdf'),
+#        width = 12, height = 2.75)
+```
+
+# Experiment 2
+
+## Data
+
+### Trial info
+
+```{r}
+trial.info.exp2 = read_csv(str_c(info_dir(2), 'model_predictions.csv')) %>%
+  rename(cf_model = counterfactual,
+         int_model = intention) %>%
+  mutate(outcome = factor(outcome, levels = c('success', 'failure')),
+         cf_model = cf_model * 100,
+         int_model = int_model * 100,
+         cf_model_recode = ifelse(outcome == 'success',
+                                  100 - cf_model, cf_model),
+         int_model_recode = ifelse(outcome == 'success',
+                                   int_model, 100 - int_model))
+
+images.exp2 = data.frame(trial = 1:nrow(trial.info.exp2)) %>%
+  mutate(grob = map(.x = trial,
+                    .f = ~ readPNG(str_c(figures_dir, 'trial_stills/experiment2/', .x, '.png'))))
+```
+
+### Responsibility
+
+```{r}
+data.exp2.resp = read_trials(2, 'responsibility')
+data.exp2.resp.participants = read_participants(2, 'responsibility')
+
+data.exp2.resp.participants %>% select(id, feedback) %>% datatable(rownames = F)
+```
+
+### Counterfactual
+
+```{r}
+data.exp2.cf = read_trials(2, 'counterfactual') %>%
+  left_join(trial.info.exp2 %>%
+              select(trial, outcome),
+            by = 'trial') %>%
+  mutate(cf_recode = ifelse(outcome == 'success',
+                            100 - response, response))
+
+data.exp2.cf.participants = read_participants(2, 'counterfactual')
+
+data.exp2.cf.participants %>%
+  select(id, feedback) %>%
+  datatable(rownames = F)
+```
+
+### Intention
+
+```{r}
+data.exp2.int = read_trials(2, 'intention') %>%
+  left_join(trial.info.exp2 %>%
+              select(trial, outcome),
+            by = 'trial') %>%
+  mutate(int_recode = ifelse(outcome == 'success',
+                             response, 100 - response))
+
+data.exp2.int.participants = read_participants(2, 'intention')
+
+data.exp2.int.participants %>%
+  select(id, feedback) %>%
+  datatable(rownames = F)
+```
+
+## Demographics
+
+```{r}
+print_demographics(data.exp2.resp.participants %>%
+                     rbind(data.exp2.cf.participants) %>%
+                     rbind(data.exp2.int.participants))
+```
+
+## Analysis
+
+### Model components
+
+```{r}
+list(
+  cf = list(judgment = data.exp2.cf %>%
+              group_by(trial) %>%
+              summarise(mean = mean(response)),
+            model = trial.info.exp2 %>%
+              select(trial, mean = cf_model)),
+  int = list(judgment = data.exp2.int %>%
+               group_by(trial) %>%
+               summarise(mean = mean(response)),
+             model = trial.info.exp2 %>%
+               select(trial, mean = int_model))
+) %>%
+  map_dfr(.id = 'condition', function(x) {
+    d = left_join(x$judgment, x$model,
+                  by = 'trial',
+                  suffix = c('_judgment', '_model'))
+    tibble(r = cor(d$mean_judgment, d$mean_model),
+           rmse = rmse(d$mean_judgment, d$mean_model))
+  })
+```
+
+### Responsibility model
+
+Setting up data:
+```{r}
+data.exp2.modeling = data.exp2.resp %>%
+  left_join(data.exp2.cf %>%
+              group_by(trial) %>%
+              summarise(cf_recode = mean(cf_recode)),
+            by = 'trial') %>%
+  left_join(data.exp2.int %>%
+              group_by(trial) %>%
+              summarise(int_recode = mean(int_recode)),
+            by = 'trial') %>%
+  left_join(trial.info.exp2, by = 'trial')
+```
+
+Model fitting:
+```{r}
+fit.exp2.cf = brm(
+  formula = response ~ 1 + cf_recode + (1 | id),
+  data = data.exp2.modeling,
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.exp2.cf")
+
+summary(fit.exp2.cf)
+
+fit.exp2.int = brm(
+  formula = response ~ 1 + int_recode + (1 | id),
+  data = data.exp2.modeling,
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.exp2.int")
+
+summary(fit.exp2.int)
+
+fit.exp2.cf_int = brm(
+  formula = response ~ 1 + cf_recode + int_recode + (1 | id),
+  data = data.exp2.modeling,
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.exp2.cf_int")
+
+summary(fit.exp2.cf_int)
+
+fit.exp2.heuristic = brm(
+  formula = response ~ 1 + outcome + red_steps + blue_steps + box_steps + (1 | id),
+  data = data.exp2.modeling,
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.exp2.heuristic")
+
+summary(fit.exp2.heuristic)
+```
+
+Model comparison:
+```{r}
+fit.exp2.cf = add_criterion(
+  fit.exp2.cf,
+  criterion = "loo",
+  reloo = T,
+  file = "cache/fit.exp2.cf")
+
+fit.exp2.int = add_criterion(
+  fit.exp2.int,
+  criterion = "loo",
+  reloo = T,
+  file = "cache/fit.exp2.int")
+
+fit.exp2.cf_int = add_criterion(
+  fit.exp2.cf_int,
+  criterion = "loo",
+  reloo = T,
+  file = "cache/fit.exp2.cf_int")
+
+fit.exp2.heuristic = add_criterion(
+  fit.exp2.heuristic,
+  criterion = "loo",
+  reloo = T,
+  file = "cache/fit.exp2.heuristic")
+
+loo_compare(fit.exp2.cf,
+            fit.exp2.int,
+            fit.exp2.cf_int,
+            fit.exp2.heuristic)
+```
+
+Individual model fitting and comparison:
+```{r eval = F}
+fit.exp2.cf_individual = brm(
+  formula = response ~ 1 + cf_recode,
+  data = data.exp2.modeling %>% filter(id == 1),
+  seed = 1,
+  file = "cache/fit.exp2.cf_individual")
+
+fit.exp2.int_individual = brm(
+  formula = response ~ 1 + int_recode,
+  data = data.exp2.modeling %>% filter(id == 1),
+  seed = 1,
+  file = "cache/fit.exp2.int_individual")
+
+fit.exp2.cf_int_individual = brm(
+  formula = response ~ 1 + cf_recode + int_recode,
+  data = data.exp2.modeling %>% filter(id == 1),
+  seed = 1,
+  file = "cache/fit.exp2.cf_int_individual")
+
+fit.exp2.heuristic_individual = brm(
+  formula = response ~ 1 + outcome + red_steps + blue_steps + box_steps,
+  data = data.exp2.modeling %>% filter(id == 1),
+  seed = 1,
+  file = "cache/fit.exp2.heuristic_individual")
+
+data.exp2.fits = data.exp2.modeling %>%
+  group_by(id) %>%
+  nest() %>%
+  ungroup() %>%
+  mutate(
+    fit_cf = map(.x = data,
+                 .f = ~ update(fit.exp2.cf_individual,
+                               newdata = .x,
+                               seed = 1)),
+    fit_int = map(.x = data,
+                  .f = ~ update(fit.exp2.int_individual,
+                                newdata = .x,
+                                seed = 1)),
+    fit_cf_int = map(.x = data,
+                     .f = ~ update(fit.exp2.cf_int_individual,
+                                   newdata = .x,
+                                   seed = 1)),
+    fit_heuristic = map(.x = data,
+                        .f = ~ update(fit.exp2.heuristic_individual,
+                                      newdata = .x,
+                                      seed = 1))) %>%
+  mutate(
+    fit_cf = map(.x = fit_cf,
+                 .f = ~ add_criterion(.x, criterion = "loo")),
+    fit_int = map(.x = fit_int,
+                  .f = ~ add_criterion(.x, criterion = "loo")),
+    fit_cf_int = map(.x = fit_cf_int,
+                     .f = ~ add_criterion(.x, criterion = "loo")),
+    fit_heuristic = map(.x = fit_heuristic,
+                        .f = ~ add_criterion(.x, criterion = "loo")),
+    model_comparison = pmap(
+      .l = list(cf = fit_cf,
+                int = fit_int,
+                cf_int = fit_cf_int,
+                heuristic = fit_heuristic),
+      .f = ~ loo_compare(..1, ..2, ..3, ..4)),
+    best_model = map_chr(.x = model_comparison,
+                         .f = ~ rownames(.) %>%
+                           .[1]),
+    best_model = factor(best_model,
+                        levels = c("..1", "..2", "..3", "..4"),
+                        labels = c("cf", "int", "cf_int", "heuristic")))
+
+save(list = c('data.exp2.fits'),
+     file = 'cache/exp2.model_fits.RData')
+```
+
+```{r}
+load(file = 'cache/exp2.model_fits.RData')
+
+data.exp2.fits %>%
+  count(best_model) %>%
+  arrange(desc(n))
+```
+
+### Measuring uncertainty
+
+```{r}
+dist_summary = bind_rows(
+  data.exp1.cf %>% mutate(exp = 1, condition = 'cf',
+                          dist = abs(response - 50)),
+  data.exp1.int %>% mutate(exp = 1, condition = 'int',
+                           dist = abs(response - 50)),
+  data.exp2.cf %>% mutate(exp = 2, condition = 'cf',
+                          dist = abs(response - 50)),
+  data.exp2.int %>% mutate(exp = 2, condition = 'int',
+                           dist = abs(response - 50))
+)
+
+dist_summary %>%
+  group_by(exp, condition) %>%
+  summarise(mean_dist = mean(dist),
+            ci_low = mean_cl_boot(dist)$ymin,
+            ci_high = mean_cl_boot(dist)$ymax) %>%
+  mutate(exp = factor(exp))
+```
+
+Comparing intention judgments:
+```{r}
+fit.dist.int = brm(
+  formula = dist ~ 1 + exp,
+  data = dist_summary %>% filter(condition == 'int'),
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.dist.int")
+
+# summary(fit.dist.int)
+hypothesis(fit.dist.int, "exp < 0", alpha = 0.05)
+```
+
+Comparing counterfactual judgments:
+```{r}
+fit.dist.cf = brm(
+  formula = dist ~ 1 + exp,
+  data = dist_summary %>% filter(condition == 'cf'),
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.dist.cf")
+
+# summary(fit.dist.cf)
+hypothesis(fit.dist.cf, "exp < 0", alpha = 0.05)
+```
+
+## Figures
+
+```{r}
+exp2.conditions = c('int', 'cf', 'resp')
+
+exp2.condition_labels = c('int' = 'Intention',
+                          'cf' = 'Counterfactual',
+                          'resp' = 'Responsibility')
+
+exp2.condition_colors = c('int' = 'tan2',
+                          'cf' = 'orchid3',
+                          'resp' = 'deepskyblue')
+
+data.exp2.long = data.exp2.resp %>%
+  mutate(condition = 'resp') %>%
+  rbind(data.exp2.cf %>%
+          select(-outcome, -cf_recode) %>%
+          mutate(condition = 'cf')) %>%
+  rbind(data.exp2.int %>%
+          select(-outcome, -int_recode) %>%
+          mutate(condition = 'int')) %>%
+  mutate(condition = factor(condition, levels = exp2.conditions))
+
+data.exp2.model = trial.info.exp2 %>%
+  select(trial, cf = cf_model, int = int_model) %>%
+  left_join(data.exp2.modeling %>%
+              cbind(fit.exp2.cf_int %>%
+                      fitted(newdata = data.exp2.modeling,
+                             re_formula = NA) %>%
+                      as_tibble() %>%
+                      select(pred = Estimate)) %>%
+              distinct(trial, pred) %>%
+              rename(resp = pred),
+            by = 'trial') %>%
+  pivot_longer(cols = -trial,
+               names_to = 'condition',
+               values_to = 'prediction') %>%
+  mutate(condition = factor(condition, levels = exp2.conditions))
+```
+
+### All trials
+
+```{r fig.width = 12, fig.height = 13}
+ggplot(data = data.exp2.long,
+       mapping = aes(x = condition,
+                     y = response,
+                     fill = condition)) +
+  # mean judgments
+  stat_summary(fun = "mean",
+               geom = "bar",
+               color = "black",
+               alpha = 0.8,
+               linewidth = 0.1) +
+  # individual participant judgments
+  geom_point(size = 1,
+             stroke = 0.5,
+             shape = 21,
+             color = 'gray40',
+             alpha = 0.5,
+             position = position_jitter(height = 0, width = 0.2),
+             show.legend = F) +
+  # error bars
+  stat_summary(fun.data = mean_cl_boot,
+               geom = "linerange",
+               color = "black",
+               linewidth = 1) +
+  # model predictions
+  geom_point(data = data.exp2.model,
+             mapping = aes(y = prediction),
+             size = 3,
+             stroke = 0.6,
+             shape = 21,
+             show.legend = F) +
+  # trial images
+  geom_custom(data = images.exp2,
+              inherit.aes = F,
+              mapping = aes(data = grob,
+                            x = -Inf, y = Inf),
+              grob_fun = function(x) rasterGrob(
+                x, interpolate = T,
+                vjust = 0, hjust = 0,
+                height = unit(3.8, "cm"))) +
+  # trial image labels
+  geom_text(aes(label = trial,
+                x = 0.68, y = 124),
+            color = 'black',
+            size = 6,
+            check_overlap = T) +
+  facet_wrap(~ trial, nrow = 4, scales = 'free_x') +
+  scale_fill_manual(values = exp2.condition_colors,
+                    labels = exp2.condition_labels) +
+  scale_y_continuous(name = 'Judgments',
+                     breaks = seq(0, 100, 25),
+                     expand = expansion(mult = 0.01)) +
+  coord_cartesian(clip = "off",
+                  ylim = c(0, 110)) +
+  theme(text = element_text(size = 16),
+        legend.position = 'bottom',
+        legend.direction = 'horizontal',
+        legend.text = element_text(
+          size = 16,
+          margin = margin(l = 0.2, r = 1, unit = 'cm')),
+        legend.title = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        panel.grid.major.y = element_line(),
+        panel.spacing.y = unit(4.1, "cm"),
+        plot.margin = margin(t = 3.9, r = 0, b = 0, l = 0, unit = 'cm'))
+
+# ggsave(str_c(figures_dir, 'exp2_bar_all.pdf'),
+#        width = 12, height = 13)
+```
+
+### Selected trials
+
+```{r fig.width = 12, fig.height = 3.5}
+selected_trials = c(6, 2, 16, 12, 23, 24)
+
+ggplot(data = data.exp2.long %>%
+         filter(trial %in% selected_trials) %>%
+         mutate(trial = factor(trial, levels = selected_trials),
+                trial_label = as.integer(trial)),
+       mapping = aes(x = condition,
+                     y = response,
+                     fill = condition)) +
+  # mean judgments
+  stat_summary(fun = "mean",
+               geom = "bar",
+               color = "black",
+               alpha = 0.8,
+               linewidth = 0.1) +
+  # individual participant judgments
+  geom_point(size = 1,
+             shape = 21,
+             color = 'gray40',
+             alpha = 0.5,
+             position = position_jitter(height = 0, width = 0.2),
+             show.legend = F) +
+  # error bars
+  stat_summary(fun.data = mean_cl_boot,
+               geom = "linerange",
+               color = "black",
+               linewidth = 1) +
+  # model predictions
+  geom_point(data = data.exp2.model %>%
+               filter(trial %in% selected_trials),
+             mapping = aes(y = prediction),
+             size = 3,
+             stroke = 0.6,
+             shape = 21,
+             show.legend = F) +
+  # trial images
+  geom_custom(data = images.exp2 %>%
+                filter(trial %in% selected_trials),
+              inherit.aes = F,
+              mapping = aes(data = grob,
+                            x = -Inf, y = Inf),
+              grob_fun = function(x) rasterGrob(
+                x, interpolate = T,
+                vjust = 0, hjust = 0,
+                height = unit(3.7, 'cm'))) +
+  # trial image labels
+  geom_text(aes(label = trial_label,
+                x = 0.7, y = 125),
+            color = 'black',
+            size = 7,
+            check_overlap = T) +
+  facet_wrap(~ trial, nrow = 1, scales = 'free_x') +
+  scale_fill_manual(values = exp2.condition_colors,
+                    labels = exp2.condition_labels) +
+  scale_y_continuous(name = 'Judgments',
+                     breaks = seq(0, 100, 25),
+                     expand = expansion(mult = 0.01)) +
+  coord_cartesian(clip = "off",
+                  ylim = c(0, 110)) +
+  theme(text = element_text(size = 16),
+        legend.position = 'bottom',
+        legend.direction = 'horizontal',
+        legend.text = element_text(
+          size = 16,
+          margin = margin(l = 0.2, r = 1, unit = 'cm')),
+        legend.title = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        panel.grid.major.y = element_line(),
+        plot.margin = margin(t = 3.8, l = 0,
+                             r = 0, b = 0, unit = 'cm'))
+
+# ggsave(str_c(figures_dir, 'exp2_bar_select.pdf'),
+#        width = 12, height = 3.5)
+```
+
+### Responsibility
+
+```{r fig.width = 12, fig.height = 3}
+resp_scatterplot2 = function(fit, x_label, y_label = '') {
+  data.exp2.modeling %>%
+    cbind(fit %>%
+            fitted(newdata = data.exp2.modeling,
+                   re_formula = NA) %>%
+            as_tibble() %>%
+            select(pred_resp_mean = Estimate)) %>%
+    distinct(trial, pred_resp_mean) %>%
+    left_join(data.exp2.resp %>%
+                group_by(trial) %>%
+                summarise(resp_mean = mean(response),
+                          resp_low = smean.cl.boot(response)[2],
+                          resp_high = smean.cl.boot(response)[3]),
+              by = 'trial') %>%
+    mutate(pred_resp_mean = pmax(pmin(pred_resp_mean, 100), 0),
+           pred_resp_low = pred_resp_mean,
+           pred_resp_high = pred_resp_mean) %>%
+    scatterplot('pred_resp', x_label, 'resp', y_label)
+}
+
+plot.exp2.int = resp_scatterplot2(
+  fit.exp2.int,
+  '<span style="color:tan2">Intention</span>',
+  'Responsibility')
+plot.exp2.cf = resp_scatterplot2(
+  fit.exp2.cf,
+  '<span style="color:orchid3">Counterfactual</span>')
+plot.exp2.cf_int = resp_scatterplot2(
+  fit.exp2.cf_int,
+  '<span style="color:tan2">Intention</span> + <span style="color:orchid3">Counterfactual</span>')
+plot.exp2.heuristic = resp_scatterplot2(
+  fit.exp2.heuristic,
+  'Heuristic')
+
+plot.exp2.int + plot.exp2.cf + plot.exp2.cf_int + plot.exp2.heuristic +
+  plot_layout(nrow = 1) &
+  theme(plot.margin = margin(0))
+
+# ggsave(str_c(figures_dir, 'exp2_responsibility.pdf'),
+#        width = 12, height = 3)
+```
+
+# Experiment 3
+
+## Data
+
+### Trial info
+
+```{r}
+trial.info.exp3 = read_csv(str_c(info_dir(3), 'model_predictions.csv')) %>%
+  select(-intention_t1) %>%
+  rename(cf_belief_no_prior = counterfactual_belief_no_prior,
+         cf_belief_with_prior = counterfactual_belief_with_prior,
+         cf = counterfactual,
+         int_no_prior = intention_t2_no_prior,
+         int_with_prior = intention_t2_with_prior) %>%
+  mutate(trial_type = factor(trial_type,
+                             levels = c('helping', 'hindering')),
+         across(c(-trial, -trial_type), ~ .x * 100))
+
+images.exp3.t1 = data.frame(trial = 1:nrow(trial.info.exp3)) %>%
+  mutate(grob = map(.x = trial,
+                    .f = ~ readPNG(str_c(figures_dir, 'trial_stills/experiment3/', .x, '-1.png'))))
+
+images.exp3.t2 = data.frame(trial = 1:nrow(trial.info.exp3)) %>%
+  mutate(grob = map(.x = trial,
+                    .f = ~ readPNG(str_c(figures_dir, 'trial_stills/experiment3/', .x, '-2.png'))))
+```
+
+### Trials
+
+```{r}
+data.exp3 = read_trials(3, 'no_prior') %>%
+  mutate(condition = 'no_prior') %>%
+  rbind(read_trials(3, 'with_prior') %>%
+          select(-judge_t1) %>%
+          mutate(condition = 'with_prior')) %>%
+  mutate(condition = factor(condition,
+                            levels = c('no_prior', 'with_prior'))) %>%
+  left_join(trial.info.exp3 %>%
+              select(trial, trial_type))
+
+contrasts(data.exp3$condition) = c(-1, 1)
+contrasts(data.exp3$trial_type) = c(-1, 1)
+```
+
+### Participants
+
+```{r}
+data.exp3.participants = read_participants(3, 'no_prior') %>%
+  mutate(condition = 'no_prior') %>%
+  rbind(read_participants(3, 'with_prior') %>%
+          mutate(condition = 'with_prior'))
+
+data.exp3.participants %>%
+  select(id, feedback) %>%
+  datatable(rownames = F)
+```
+
+## Demographics
+
+```{r}
+print_demographics(data.exp3.participants)
+```
+
+## Analysis
+
+### Prior expectations
+
+```{r}
+data.exp3.prior_judge = read_trials(3, 'with_prior') %>%
+  select(id, trial, judge = judge_t1) %>%
+  left_join(trial.info.exp3 %>% select(trial, trial_type))
+
+data.exp3.prior_judge %>%
+  group_by(trial_type) %>%
+  summarise(mean = mean(judge), sd = sd(judge))
+
+t.test(formula = judge ~ trial_type, data = data.exp3.prior_judge)
+```
+
+### Responsibility data
+
+```{r}
+data.exp3 %>%
+  pivot_longer(cols = c(resp_red, resp_blue), names_to = "agent", values_to = "resp") %>%
+  group_by(condition, agent) %>%
+  reframe({
+    m = mean_cl_boot(resp, conf.int = 0.95)
+    tibble(mean = round(m$y, 1), lower = round(m$ymin, 1), upper = round(m$ymax, 1))
+  })
+
+data.exp3 %>%
+  pivot_longer(cols = c(resp_red, resp_blue), names_to = "agent", values_to = "resp") %>%
+  group_by(trial_type, agent) %>%
+  reframe({
+    m = mean_cl_boot(resp, conf.int = 0.95)
+    tibble(mean = round(m$y, 1), lower = round(m$ymin, 1), upper = round(m$ymax, 1))
+  })
+```
+
+### Responsibility model
+
+Setting up data:
+```{r}
+data.exp3.modeling = data.exp3 %>%
+  select(-trial_type) %>%
+  left_join(trial.info.exp3 %>%
+              select(trial, starts_with('cf')) %>%
+              pivot_longer(cols = starts_with('cf_belief'),
+                           names_to = 'condition',
+                           names_prefix = 'cf_belief_',
+                           values_to = 'cf_belief') %>%
+              mutate(condition = factor(condition,
+                                        levels = c('no_prior', 'with_prior'))),
+            by = c('trial', 'condition')) %>%
+  mutate(int = 100 - int)
+```
+
+Model fitting:
+```{r}
+fit.exp3.blue = brm(
+  formula = resp_blue ~ 1 + cf + int + (1 | id),
+  data = data.exp3.modeling,
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.exp3.blue")
+
+summary(fit.exp3.blue)
+
+fit.exp3.red = brm(
+  formula = resp_red ~ 1 + cf_belief + (1 | id),
+  data = data.exp3.modeling,
+  iter = 2000,
+  seed = 1,
+  file = "cache/fit.exp3.red")
+
+summary(fit.exp3.red)
+```
+
+## Figures
+
+```{r}
+exp3.judgment_labels = c('int' = 'Intention',
+                         'resp_blue' = 'Responsibility (Blue)',
+                         'resp_red' = 'Responsibility (Red)')
+
+exp3.judgment_names = names(exp3.judgment_labels)
+
+exp3.judgment_colors_x = c('int.no_prior' = '#FAE1D0',
+                           'int.with_prior' = 'tan2',
+                           'resp_blue.no_prior' = '#C7EEFE',
+                           'resp_blue.with_prior' = 'deepskyblue',
+                           'resp_red.no_prior' = '#FDCBCD',
+                           'resp_red.with_prior' = 'brown1')
+exp3.judgment_colors = c('int' = 'tan2',
+                         'resp_blue' = 'deepskyblue',
+                         'resp_red' = 'brown1')
+
+exp3.condition_alphas = c(0.3, 0.8)
+exp3.condition_labels = c('no_prior' = 'No prior',
+                          'with_prior' = 'With prior')
+exp3.trial_type_labels = c('helping' = 'Helping trials',
+                           'hindering' = 'Hindering trials')
+
+dodge_width = 0.9
+
+trial_labels.exp3 = data.frame(
+  trial = rep(1:nrow(trial.info.exp3), each = 2),
+  trial_type = rep(c('hindering', 'helping'),
+                   each = nrow(trial.info.exp3)),
+  t = rep(1:2, times = nrow(trial.info.exp3)),
+  tt = rep(c('A', 'B'), times = nrow(trial.info.exp3))) %>%
+  mutate(trial_label = str_c(trial, tt))
+```
+
+```{r}
+data.exp3.long = data.exp3 %>%
+  pivot_longer(cols = c(starts_with('int'), starts_with('resp')),
+               names_to = 'judgment_type',
+               values_to = 'response') %>%
+  mutate(judgment_type = factor(judgment_type,
+                                levels = exp3.judgment_names),
+         condition = factor(condition,
+                            levels = c('no_prior', 'with_prior')))
+
+data.exp3.model = trial.info.exp3 %>%
+  select(trial, trial_type, starts_with('int_')) %>%
+  pivot_longer(cols = c(-trial, -trial_type),
+               names_to = c(".value", "condition"),
+               names_pattern = "^(int)_(.*)$") %>%
+  left_join(data.exp3.modeling %>%
+              cbind(fit.exp3.red %>%
+                      fitted(newdata = data.exp3.modeling,
+                             re_formula = NA) %>%
+                      as_tibble() %>%
+                      select(pred = Estimate)) %>%
+              distinct(trial, condition, pred) %>%
+              rename(resp_red = pred),
+            by = c('trial', 'condition')) %>%
+  left_join(data.exp3.modeling %>%
+              cbind(fit.exp3.blue %>%
+                      fitted(newdata = data.exp3.modeling,
+                             re_formula = NA) %>%
+                      as_tibble() %>%
+                      select(pred = Estimate)) %>%
+              group_by(trial, condition) %>%
+              summarise(resp_blue = mean(pred)) %>%
+              ungroup(),
+            by = c('trial', 'condition')) %>%
+  pivot_longer(cols = c(-trial, -condition, -trial_type),
+               names_to = 'judgment_type',
+               values_to = 'response')
+
+data.exp3.means = data.exp3 %>%
+  group_by(trial, condition) %>%
+  summarise(resp_red_mean = mean(resp_red),
+            resp_red_low = smean.cl.boot(resp_red)[2],
+            resp_red_high = smean.cl.boot(resp_red)[3],
+            resp_blue_mean = mean(resp_blue),
+            resp_blue_low = smean.cl.boot(resp_blue)[2],
+            resp_blue_high = smean.cl.boot(resp_blue)[3]) %>%
+  ungroup()
+```
+
+### Aggregated judgments
+
+```{r fig.width = 12, fig.height = 5}
+selected_trials = c(12, 1)
+
+ggplot(data = data.exp3.long,
+       mapping = aes(x = judgment_type,
+                     y = response,
+                     group = condition)) +
+  # mean judgments
+  stat_summary(mapping = aes(fill = judgment_type,
+                             alpha = condition),
+               fun = "mean",
+               geom = "bar",
+               color = "black",
+               linewidth = 0.2,
+               position = position_dodge2(width = dodge_width,
+                                          padding = 0.1)) +
+  scale_alpha_manual(values = exp3.condition_alphas,
+                     labels = exp3.condition_labels) +
+  scale_fill_manual(values = exp3.judgment_colors,
+                    labels = exp3.judgment_labels) +
+  new_scale_fill() +
+  # individual participant judgments
+  geom_point(mapping = aes(fill = interaction(judgment_type, condition)),
+             size = 1,
+             shape = 21,
+             color = 'gray50',
+             alpha = 0.2,
+             position = position_jitterdodge(dodge.width = dodge_width),
+             show.legend = F) +
+  # error bars
+  stat_summary(fun.data = mean_cl_boot,
+               geom = "linerange",
+               color = "black",
+               alpha = 0.8,
+               linewidth = 1,
+               position = position_dodge(width = dodge_width),
+               show.legend = F) +
+  # model predictions
+  geom_point(data = data.exp3.model %>%
+               group_by(trial_type, condition, judgment_type) %>%
+               summarise(response = mean(response)),
+             mapping = aes(fill = interaction(judgment_type, condition)),
+             size = 3,
+             stroke = 0.6,
+             shape = 21,
+             position = position_dodge(width = dodge_width),
+             show.legend = F) +
+  scale_fill_manual(values = exp3.judgment_colors_x) +
+  # example trial images A
+  geom_custom(data = images.exp3.t1 %>%
+                filter(trial %in% selected_trials) %>%
+                merge(trial.info.exp3 %>%
+                        select(trial, trial_type)),
+              inherit.aes = F,
+              mapping = aes(data = grob, x = -Inf, y = Inf),
+              grob_fun = function(x) rasterGrob(
+                x, interpolate = T,
+                vjust = 0, hjust = -0.3,
+                height = unit(4.5, 'cm'))) +
+  # example trial images B
+  geom_custom(data = images.exp3.t2 %>%
+                filter(trial %in% selected_trials) %>%
+                merge(trial.info.exp3 %>%
+                        select(trial, trial_type)),
+              inherit.aes = F,
+              mapping = aes(data = grob, x = -Inf, y = Inf),
+              grob_fun = function(x) rasterGrob(
+                x, interpolate = T,
+                vjust = 0, hjust = -1.35,
+                height = unit(4.5, 'cm'))) +
+  # example trial image labels
+  geom_text(data = data.frame(trial_type = 'helping',
+                              label = 'Example'),
+            inherit.aes = F,
+            mapping = aes(label = label,
+                          x = 0.1, y = 160),
+            angle = 90,
+            size = 6, 
+            show.legend = F) +
+  # trial type labels
+  geom_rect(data = data.frame(xmin = -Inf, xmax = Inf,
+                              ymin = 207, ymax = 230),
+            mapping = aes(xmin = xmin, xmax = xmax,
+                          ymin = ymin, ymax = ymax),
+            inherit.aes = F, fill = 'gray90') +
+  geom_text(data = data.frame(trial = rep(selected_trials, each = 2),
+                              t = rep(1:2, times = 2),
+                              label = rep(c('A', 'B'), times = 2)),
+            aes(label = label, x = (t-1)*1.28 + 0.87, y = 121),
+            inherit.aes = F,
+            color = 'black',
+            size = 8,
+            show.legend = F) +
+  facet_wrap(~ trial_type,
+             labeller = as_labeller(exp3.trial_type_labels)) +
+  scale_y_continuous(name = 'Judgments',
+                     breaks = seq(0, 100, 25),
+                     expand = expansion(mult = 0.01)) +
+  coord_cartesian(clip = "off",
+                  ylim = c(0, 110),
+                  xlim = c(1, 3)) +
+  theme(text = element_text(size = 16),
+        legend.position = 'bottom',
+        legend.direction = 'horizontal',
+        legend.text = element_text(
+          size = 16,
+          margin = margin(l = 0.2, r = 0.4, unit = 'cm')),
+        legend.margin = margin(l = 0.5, r = 0.5, unit = 'cm'),
+        legend.title = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(
+          size = 16, face = 'bold',
+          margin = margin(b = 5.1, t = 0.3, unit = 'cm')),
+        panel.grid.major.y = element_line(),
+        plot.margin = margin(0))
+
+# ggsave(str_c(figures_dir, 'exp3_bar_aggregate.pdf'),
+#        width = 12, height = 5)
+```
+
+### All trials
+
+```{r fig.width = 12, fig.height = 13}
+ggplot(data = data.exp3.long,
+       mapping = aes(x = judgment_type,
+                     y = response,
+                     group = condition)) +
+  stat_summary(mapping = aes(fill = judgment_type,
+                             alpha = condition),
+               fun = "mean",
+               geom = "bar",
+               color = "black",
+               linewidth = 0.1,
+               position = position_dodge(width = dodge_width)) +
+  scale_alpha_manual(values = exp3.condition_alphas,
+                     labels = exp3.condition_labels) +
+  scale_fill_manual(values = exp3.judgment_colors,
+                    labels = exp3.judgment_labels,
+                    na.translate = F) +
+  new_scale_fill() +
+  geom_point(mapping = aes(fill = interaction(judgment_type, condition)),
+             size = 1,
+             shape = 21,
+             color = "gray40",
+             alpha = 0.5,
+             position = position_jitterdodge(dodge.width = dodge_width),
+             show.legend = F) +
+  stat_summary(fun.data = mean_cl_boot,
+               geom = "linerange",
+               color = "black",
+               alpha = 0.8,
+               linewidth = 1,
+               position = position_dodge(width = dodge_width),
+               show.legend = F) +
+  geom_point(data = data.exp3.model,
+             mapping = aes(fill = interaction(judgment_type, condition)),
+             size = 3,
+             stroke = 0.6,
+             shape = 21,
+             position = position_dodge(width = dodge_width),
+             show.legend = F) +
+  scale_fill_manual(values = exp3.judgment_colors_x) +
+  geom_custom(data = images.exp3.t1,
+              mapping = aes(data = grob, x = -Inf, y = Inf),
+              inherit.aes = F,
+              grob_fun = function(x) rasterGrob(
+                x, interpolate = T,
+                vjust = 0, hjust = -0.1,
+                height = unit(3.6, 'cm'))) +
+  geom_custom(data = images.exp3.t2,
+              mapping = aes(data = grob, x = -Inf, y = Inf),
+              inherit.aes = F,
+              grob_fun = function(x) rasterGrob(
+                x, interpolate = T,
+                vjust = 0, hjust = -1.12,
+                height = unit(3.6, 'cm'))) +
+  geom_text(data = trial_labels.exp3,
+            aes(label = trial_label,
+                x = (t-1)*1.5 + 0.73,
+                y = 122),
+            inherit.aes = F,
+            color = 'black',
+            size = 6,
+            check_overlap = T,
+            show.legend = F) +
+  facet_wrap(~ trial, nrow = 4, scales = "free_x") +
+  scale_y_continuous(name = 'Judgments',
+                     breaks = seq(0, 100, 25),
+                     expand = expansion(mult = 0.01)) +
+  coord_cartesian(clip = "off", ylim = c(0, 110)) +
+  theme(text = element_text(size = 16),
+        legend.position = 'bottom',
+        legend.direction = 'horizontal',
+        legend.text = element_text(
+          size = 16,
+          margin = margin(l = 0.2, r = 0.4, unit = 'cm')),
+        legend.margin = margin(l = 0.5, r = 0.5, unit = 'cm'),
+        legend.title = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        panel.grid.major.y = element_line(),
+        panel.spacing.y = unit(3.9, "cm"),
+        plot.margin = margin(t = 3.7, l = 0, r = 0, b = 0, unit = 'cm'))
+
+# ggsave(str_c(figures_dir, 'exp3_bar_all.pdf'),
+#        width = 12, height = 13)
+```
+
+### Responsibility
+
+Red:
+```{r fig.width = 9, fig.height = 4}
+data.exp3.red = data.exp3.means %>%
+  left_join(data.exp3.model %>%
+              filter(judgment_type == 'resp_red') %>%
+              rename(pred_mean = response),
+            by = c('trial', 'condition'))
+
+r = cor(data.exp3.red$pred_mean, data.exp3.red$resp_red_mean)
+rmse = rmse(data.exp3.red$pred_mean, data.exp3.red$resp_red_mean)
+
+plot.exp3.red = ggplot(data = data.exp3.red,
+                       aes(x = pred_mean,
+                           y = resp_red_mean,
+                           fill = condition)) +
+  geom_abline(intercept = 0, slope = 1,
+              linetype = 2, size = 0.2) +
+  geom_linerange(size = 0.7,
+                 mapping = aes(ymin = resp_red_low,
+                               ymax = resp_red_high),
+                 color = 'lightgray') +
+  geom_point(shape = 21, size = 3, stroke = 0.1) +
+  geom_text(label = sprintf('RMSE = %.2f\nr = %.2f', rmse, r),
+            hjust = 0, x = 0, y = 95,
+            size = 4.5, check_overlap = T) +
+  scale_x_continuous(name = 'Counterfactual Belief Model',
+                     limits = c(0, 100)) +
+  scale_y_continuous(name = 'Responsibility for Red',
+                     limits = c(0, 100)) +
+  scale_fill_manual(values = c('no_prior' = exp3.judgment_colors_x[['resp_red.no_prior']],
+                               'with_prior' = exp3.judgment_colors_x[['resp_red.with_prior']]),
+                    labels = c('No prior', 'With prior')) +
+  theme(legend.position = c(0.9, 0.2),
+        legend.title = element_blank(),
+        text = element_text(size = 16),
+        axis.title.x = element_markdown(size = 16),
+        axis.title.y = element_markdown(size = 16),
+        aspect.ratio = 1)
+```
+
+Blue:
+```{r}
+data.exp3.blue = data.exp3.means %>%
+  left_join(data.exp3.model %>%
+              filter(judgment_type == 'resp_blue') %>%
+              rename(pred_mean = response),
+            by = c('trial', 'condition'))
+
+r = cor(data.exp3.blue$pred_mean, data.exp3.blue$resp_blue_mean)
+rmse = rmse(data.exp3.blue$pred_mean, data.exp3.blue$resp_blue_mean)
+
+plot.exp3.blue = ggplot(data = data.exp3.blue,
+                        aes(x = pred_mean,
+                            y = resp_blue_mean,
+                            fill = condition)) +
+  geom_abline(intercept = 0, slope = 1,
+              linetype = 2, size = 0.2) +
+  geom_linerange(size = 0.7,
+                 mapping = aes(ymin = resp_blue_low,
+                               ymax = resp_blue_high),
+                 color = 'lightgray') +
+  geom_point(shape = 21, size = 3, stroke = 0.1) +
+  geom_text(label = sprintf('RMSE = %.2f\nr = %.2f', rmse, r),
+            hjust = 0, x = 0, y = 95,
+            size = 4.5, check_overlap = T) +
+  scale_x_continuous(name = 'Intention + Counterfactual Model',
+                     limits = c(0, 100)) +
+  scale_y_continuous(name = 'Responsibility for Blue',
+                     limits = c(0, 100)) +
+  scale_fill_manual(values = c('no_prior' = exp3.judgment_colors_x[['resp_blue.no_prior']],
+                               'with_prior' = exp3.judgment_colors_x[['resp_blue.with_prior']]),
+                    labels = c('No prior', 'With prior')) +
+  theme(legend.position = c(0.9, 0.2),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        text = element_text(size = 16),
+        axis.title.x = element_markdown(size = 16),
+        axis.title.y = element_markdown(size = 16),
+        aspect.ratio = 1)
+```
+
+```{r fig.width = 9, fig.height = 4}
+plot.exp3.blue + plot_spacer() + plot.exp3.red +
+  plot_layout(widths = c(8, 1, 8)) &
+  theme(plot.margin = margin(t = 0, r = 0.3, b = 0, l = 0, unit = 'cm'))
+
+# ggsave(str_c(figures_dir, 'exp3_responsibility.pdf'),
+#        width = 9, height = 4)
+```
+
+# Session info
+```{r}
+sessionInfo()
+```
